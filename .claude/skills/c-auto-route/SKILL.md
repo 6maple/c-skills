@@ -28,19 +28,10 @@ impossible route                           -> /c-clarify
 
 ## Response contract
 
+Use request text only; no repo/doc/probe reads.
 Emit one slash command only. No prose, no fence, no appendix. Stop.
 Use the original task, tightened only when needed.
 
 ## Out
 
 /c-skill <task>
-
-## Never
-
-- no file reads
-- no skill reads
-- no code edits
-- no docs/work item I/O
-- no stack probe
-- no second command
-- no explanation

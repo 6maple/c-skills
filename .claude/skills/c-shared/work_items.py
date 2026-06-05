@@ -184,15 +184,15 @@ def print_list(paths: dict[str, Path]) -> None:
     print(f"work-items(active={len(active)}, archived_recent={len(archived)})")
     if active:
         print("\nactive:")
-        for item in active:
-            print(f"- {item['id']} {item['status']} {item['title']} {item['path']}")
+        for i, item in enumerate(active, 1):
+            print(f"{i}. id={item['id']} status={item['status']} title={item['title']} path={item['path']}")
     if archived:
         print("\nrecent-archived:")
-        for item in archived:
-            print(f"- {item['id']} {item['status']} {item['title']} {item['path']}")
+        for i, item in enumerate(archived, 1):
+            print(f"{i}. id={item['id']} status={item['status']} title={item['title']} path={item['path']}")
     risks = []
     if len(active) > 1:
-        risks.append("active > 1; select one before reading details")
+        risks.append("active > 1; resolve by id/path, not display number")
     bad = [x for x in active if x["status"] not in STATUSES]
     if bad:
         risks.append("invalid status in active work item")
@@ -272,9 +272,9 @@ def resolve(paths: dict[str, Path], key: str | None, active_only: bool) -> None:
         sys.exit("error: no active work item")
     if len(active_paths) > 1:
         print(f"error: multiple active work items: {len(active_paths)}")
-        for path in active_paths:
+        for i, path in enumerate(active_paths, 1):
             item = parse_item(path)
-            print(f"- {item['id']} {item['status']} {item['title']} {item['path']}")
+            print(f"{i}. id={item['id']} status={item['status']} title={item['title']} path={item['path']}")
         sys.exit(2)
     path = active_paths[0]
     reject_final_in_active(path, paths)
@@ -332,7 +332,7 @@ def validate(paths: dict[str, Path]) -> None:
     if len(active) > 5:
         risks.append("active work items > 5")
     if len(active) > 1:
-        risks.append("multiple active work items; select one before reading details")
+        risks.append("multiple active work items; resolve by id/path, not display number")
     for item in active:
         if item["status"] not in STATUSES:
             risks.append(f"invalid active status: {item['id']}")

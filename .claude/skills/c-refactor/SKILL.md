@@ -14,7 +14,7 @@ Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs
 
 ## Skill boundary
 
-This skill is terminal for this turn. Never read/execute another `c-*` skill. If needed, put it only under `next:` and stop; `next:` is inert text.
+Terminal turn. Do not read/execute another `c-*` skill. Put next command only under `next:`.
 
 ## Algo
 
@@ -41,6 +41,7 @@ Use stdout path only. Fail=no scan. None=skip update unless handoff is needed. M
 Emit only the output shape below. No prose, no fence, no appendix. Stop after final field.
 Use short wrapped lines; put long values under bullets.
 
+
 ## Out
 
 c-refactor(done|partial|blocked)
@@ -49,16 +50,14 @@ chg:
 - ...
 ev:
 - ...
-doc: none|path
+doc:
+- none
 risk:
 - ...
 next:
 - ...
 
-## Never
+## Guards
 
-- no feature changes
-- no opportunistic rewrites
-- no dependency upgrades unless requested
-- no public API change unless explicit
-- no mixed bug fix unless required and deferred
+- preserve behavior, public API, and dependencies unless explicit
+- defer required bug fixes instead of mixing work

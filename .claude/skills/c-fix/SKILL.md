@@ -14,7 +14,7 @@ Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs
 
 ## Skill boundary
 
-This skill is terminal for this turn. Never read/execute another `c-*` skill. If needed, put it only under `next:` and stop; `next:` is inert text.
+Terminal turn. Do not read/execute another `c-*` skill. Put next command only under `next:`.
 
 ## Algo
 
@@ -41,6 +41,7 @@ No trivial work item. Update resolved item. Incomplete handoff -> recommend `c-h
 Emit only the output shape below. No prose, no fence, no appendix. Stop after final field.
 Use short wrapped lines; put long values under bullets.
 
+
 ## Out
 
 c-fix(done|partial|blocked)
@@ -51,16 +52,15 @@ fix:
 - ...
 ev:
 - ...
-doc: none|path
+doc:
+- none
 risk:
 - ...
 next:
 - ...
 
-## Never
+## Guards
 
-- no guess-fix when feedback is practical
-- no unrelated refactor
-- no public behavior change beyond bug
-- no leftover debug logs
-- no fake checks
+- fix only the reported/reproven bug
+- no unrelated refactor or public behavior change beyond the bug
+- no fake checks or leftover debug logs

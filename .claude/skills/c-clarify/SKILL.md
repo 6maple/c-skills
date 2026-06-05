@@ -1,22 +1,26 @@
 ---
 name: c-clarify
-description: Manual-only skill for clearing blocking ambiguity before coding.
+description: Manual-only skill for clearing blocking ambiguity before coding/planning.
 disable-model-invocation: true
 ---
 
 # c-clarify
 
-Clear blockers. No source edits.
+Clear blockers only. No source edits. No planning.
 
 Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs.*}` paths.
 
 ## Skill boundary
 
-This skill is terminal for this turn. Never read/execute another `c-*` skill. If needed, put it only under `next:` and stop; `next:` is inert text.
+Terminal turn. Do not read/execute another `c-*` skill. Put next command only under `next:`.
+
+## Boundary with c-plan
+
+`c-clarify` owns blocking questions. `c-plan` owns slice planning. If planning is still needed after answers, route to `/c-plan`; otherwise route to `/c-implement`.
 
 ## Algo
 
-inspect code/tests/README/context -> facts/assumptions/unknowns -> ask blockers -> persist if needed -> next slice.
+inspect code/tests/README/context -> facts/assumptions/unknowns -> ask only blockers -> persist if needed -> next command.
 
 ## New/empty project
 
@@ -46,7 +50,7 @@ Create one work item only for complex/high-risk/multi-session/user-requested wor
 python .claude/skills/c-shared/work_items.py create --title "<task>"
 ```
 
-Record goal, facts, assumptions, questions, first slice, next. Do not edit `{config.docs.work_items_index}`.
+Record goal, facts, assumptions, questions, next. Do not edit `{config.docs.work_items_index}`.
 
 Hard decisions -> `{config.docs.adr_dir}`. Stable terms/facts -> `{config.docs.context_file}`.
 
@@ -56,20 +60,22 @@ Emit only the output shape below. No prose, no fence, no appendix. Stop after fi
 Use short wrapped lines; put long values under bullets.
 Questions go only under `q:`. Assumptions go only under `assume:`.
 
+List rules:
+
+- `q:` uses numbered questions when blocking, otherwise `- none`
+- assumptions, docs, and `next:` use bullets
+- `blocking:<n>` must equal the count of numbered `q:` items
+- valid forms: use either `- none` or numbered items such as `1. ...`
+
 ## Out
 
-c-clarify(blocking:<n>|clear[,persist])
+c-clarify(clear|blocking:<n>[,persist])
 
 q:
-- none|...
+- none
 assume:
-- none|...
-doc: none|path
+- none
+doc:
+- none
 next:
-- /c-implement ...
-
-## Never
-
-- no speculative questions
-- no implementation design
-- no trivial work item
+- <one default action>

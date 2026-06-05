@@ -164,7 +164,7 @@ def emit(data: dict[str, Any]) -> None:
     goal = str(data.get("goal", "")).strip()
     rules = phase_rules(phase, str(data.get("mode", "")), goal)
 
-    print(f"c-auto({phase}:{status})")
+    print(f"c-auto-gate({phase}:{status})")
     print("")
     print("state:")
     print(f"- {state_path().as_posix()}")
@@ -239,12 +239,16 @@ def checkpoint(args: argparse.Namespace) -> None:
     else:
         state["status"] = "partial"
     save_state(state)
-    print(f"checkpoint: {status} {state_path().as_posix()}")
+    print(f"c-auto-checkpoint({status})")
+    print("state:")
+    print(f"- {state_path().as_posix()}")
 
 
 def reset(_args: argparse.Namespace) -> None:
     delete_state()
-    print(f"reset: {state_path().as_posix()}")
+    print("c-auto-reset(done)")
+    print("state:")
+    print(f"- {state_path().as_posix()}")
 
 
 def main() -> int:

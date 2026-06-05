@@ -12,7 +12,7 @@ Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs
 
 ## Skill boundary
 
-This skill is terminal for this turn. Never read/execute another `c-*` skill. If needed, put it only under `next:` and stop; `next:` is inert text.
+Terminal turn. Do not read/execute another `c-*` skill. Put next command only under `next:`.
 
 ## Algo
 
@@ -39,23 +39,20 @@ owner, branch, base commit, status, goal, progress, files, evidence, blockers, a
 Emit only the output shape below. No prose, no fence, no appendix. Stop after final field.
 Use short wrapped lines; put long values under bullets.
 
+
 ## Out
 
 c-handoff(saved|blocked)
 
-doc: {config.docs.work_items_active_dir}/<task>.md
+doc:
+- {config.docs.work_items_active_dir}/<task>.md
 state: active|handed-off|blocked|done
 next:
 - ...
 risk:
 - ...
 
-## Never
+## Safety
 
-- no source edits
-- no separate checkpoint docs
-- no manual index edits
-- no recursive work item scans
-- no long history
-- no secrets
-- no invented completed work/checks
+- include only current state, next step, risks, and evidence
+- omit secrets and unverified completed work/checks

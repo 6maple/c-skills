@@ -1,5 +1,5 @@
 ---
 name: c-shared
-description: never use
+description: Shared config/scripts; not user-invoked.
 disable-model-invocation: true
 ---

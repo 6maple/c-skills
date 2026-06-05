@@ -6,19 +6,21 @@ disable-model-invocation: true
 
 # c-plan
 
-Plan only. No source edits. No client todo/task tool. Even if asked to implement, output plan and stop.
+Plan only. No source edits. No questions. No client todo/task tool. Even if asked to implement, output plan and stop.
 
 Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs.*}` paths.
 
 ## Skill boundary
 
-This skill is terminal for this turn. Never read/execute another `c-*` skill. If needed, put it only under `next:` and stop; `next:` is inert text.
+Terminal turn. Do not read/execute another `c-*` skill. Put next command only under `next:`.
+
+## Boundary with c-clarify
+
+`c-plan` owns slice planning. `c-clarify` owns blocking questions. If a blocker prevents a useful plan, stop with `c-plan(blocked)` and route to `/c-clarify`.
 
 ## Algo
 
-goal -> inspect -> context -> smallest slice -> affected areas -> checks -> risks/blockers -> slices -> persist? -> stop
-
-Ask max 3 blockers.
+goal -> inspect -> context -> blockers? -> smallest slice -> affected areas -> checks -> risks -> slices -> persist? -> stop
 
 ## Persist
 
@@ -37,21 +39,33 @@ Hard decisions -> `{config.docs.adr_dir}`. Stable terms/facts -> `{config.docs.c
 Emit only the output shape below. No prose, no fence, no appendix. Stop after final field.
 Use short wrapped lines; put long values under bullets.
 
+List rules:
+
+- `slices:` uses numbered items when present, otherwise `- none`
+- blockers, docs, risks, evidence, and `next:` use bullets
+- `slices:<n>` must equal numbered `slices:` items
+- valid forms: use either `- none` or numbered items such as `1. ...`
+
 ## Out
 
-c-plan(not-needed|slices:<n>|blocking:<n>[,persist])
+c-plan(not-needed|slices:<n>|blocked[,persist])
 
-plan: none|{config.docs.work_items_active_dir}/<task>.md
+plan:
+- none
 first:
-- ...
-decision: none|needs user
-q:
-- ...
+- none
+blocker:
+- none
+slices:
+- none
+doc:
+- none
+risk:
+- none
 next:
-- /c-implement ...
+- <one default action>
 
-## Never
+## Guards
 
-- no broad rewrite unless unavoidable
-- no abstraction before repo inspection
-- no long chat plan when persisted
+- keep slices minimal; avoid broad rewrites unless unavoidable
+- inspect repo before abstraction

@@ -6,17 +6,8 @@
 
 ```bash
 npx skills@latest add https://github.com/6maple/c-skills.git
-```
-
-or
-
-```bash
+# optional:
 npx skills@latest add git@github.com:6maple/c-skills.git
-```
-
-or
-
-```bash
 npx skills@latest add https://github.com/6maple/c-skills.git -a claude-code
 ```
 
@@ -67,7 +58,7 @@ Current runtime files:
 
 Only tool scripts read/write runtime data. AI consumes stdout only.
 
-`c_auto.py` controls `/c-auto` phase, context budget, edit gate, and state. It does not call an LLM or execute edits.
+`c_auto.py` controls `/c-auto` phase, context budget, edit gate, and state. It emits `c-auto-gate(...)` as a gate contract. It does not call an LLM or execute edits.
 
 ```bash
 python .claude/skills/c-auto/c_auto.py start --goal "<task>"
@@ -78,7 +69,7 @@ python .claude/skills/c-auto/c_auto.py reset
 
 `project_probe.py` is used by `c-takeover` first. It detects project stack and emits only 100%-certain command suggestions.
 
-`work_items.py` mechanically manages active work items, resolution, status, archive, and index CSV. It rejects paths outside configured work-item dirs and does not search or summarize history.
+`work_items.py` mechanically manages active work items, resolution, status, archive, and index CSV. Work-item lists are numbered for display only; use id/path for commands. It rejects paths outside configured work-item dirs and does not search or summarize history.
 
 ```bash
 python .claude/skills/c-shared/work_items.py list
@@ -88,6 +79,17 @@ python .claude/skills/c-shared/work_items.py set-status <id-or-path> <status>
 python .claude/skills/c-shared/work_items.py archive <id-or-path>
 python .claude/skills/c-shared/work_items.py validate
 ```
+
+## Output format rules
+
+1. Numbered user-reply field: `q:`.
+2. Numbered ordered fields: `slices:`, `blocking:`, `minor:`.
+3. Bulleted fields: `ev:`, `risk:`, `doc:`, `chg:`, `fix:`, `cause:`, `next:`.
+4. Valid list forms: use either `- none` or numbered items such as `1. ...`.
+5. Count headers must match numbered items, e.g. `blocking:<n>` and `slices:<n>`.
+6. `next:` contains one default action; alternatives belong in `q:`.
+7. `c-clarify` asks blockers; `c-plan` slices work and routes blockers to `/c-clarify`.
+8. Work-item list numbers are display-only; pass `id` or `path` to `resolve`.
 
 ## Collaboration
 

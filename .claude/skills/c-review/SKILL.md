@@ -12,7 +12,7 @@ Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs
 
 ## Skill boundary
 
-This skill is terminal for this turn. Never read/execute another `c-*` skill. If needed, put it only under `next:` and stop; `next:` is inert text.
+Terminal turn. Do not read/execute another `c-*` skill. Put next command only under `next:`.
 
 ## Algo
 
@@ -25,21 +25,27 @@ Check: correctness, tests, complexity, public behavior, security, docs mismatch,
 Emit only the output shape below. No prose, no fence, no appendix. Stop after final field.
 Use short wrapped lines; put long values under bullets.
 
+List rules:
+
+- `blocking:` and `minor:` use numbered findings when present, otherwise `- none`
+- `blocking:<n>` and `minor:<n>` must equal their numbered findings
+- evidence and `next:` use bullets
+- valid forms: use either `- none` or numbered items such as `1. ...`
+
 ## Out
 
-c-review(blocking:<n>,minor:<n>|clean)
+c-review(clean|blocking:<n>,minor:<n>)
 
 blocking:
-1. file: issue -> minimal fix
+- none
 minor:
-1. file: issue -> minimal fix
+- none
 ev:
 - checks/reviewed files
 next:
-- none|...
+- none
 
-## Never
+## Guards
 
-- no broad redesign
-- no style-only noise unless harmful
-- no edits unless requested
+- report correctness/scope risks; skip harmless style noise
+- suggest minimal fixes, not redesigns

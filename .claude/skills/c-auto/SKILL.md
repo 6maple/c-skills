@@ -28,16 +28,20 @@ Reset only when user asks:
 
 python .claude/skills/c-auto/c_auto.py reset
 
-## Execution rule
+## Script stdout
 
-Run `start` or `step`, then follow stdout exactly.
+`c_auto.py` emits `c-auto-gate(<phase>:<status>)`. This is a gate, not the final user response.
+
+After `start` or `step`:
 
 - obey `allow`
-- never exceed `forbid`
+- stay within `forbid`
 - obey `budget`
 - one turn = one bounded action
 - if needed action is forbidden, stop as blocked
 - no client todo/task tool
+
+After a bounded action, run `checkpoint` when useful, then emit the final `c-auto(...)` response contract below.
 
 Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs.*}` paths.
 
@@ -58,36 +62,35 @@ Use stdout paths only. Do not scan work-items or edit `{config.docs.work_items_i
 Emit only the output shape below. No prose, no fence, no appendix. Stop after final field.
 Use short wrapped lines; put long values under bullets.
 
+List rules:
+
+- `q:` uses numbered questions when status is `ask`, otherwise `- none`
+- observations, actions, docs, risks, evidence, and `next:` use bullets
+- valid forms: use either `- none` or numbered items such as `1. ...`
+
 ## Out
 
 c-auto(<phase>:done|partial|blocked|ask|checkpoint)
 
 obs:
-
 - ...
-  act:
+act:
 - ...
-  changed:
-- none|...
-  checks:
-- none|not run: reason|...
-  doc: none|path
-  q:
-- none|...
-  risk:
-- none|...
-  next:
-- stop|answer q|continue: <next bounded step>
+changed:
+- none
+checks:
+- none
+doc:
+- none
+q:
+- none
+risk:
+- none
+next:
+- <one default action>
 
-## Never
+## Guards
 
-- no other `c-*` skill reads/execution
-- no skill search/glob
-- no manual runtime data reads/writes
-- no recursive work item scans
-- no manual cache/index reads/writes
-- no broad repo/doc scans
-- no client todo/task tool
-- no scope creep
-- no fake checks
-- no auto-merge of unrelated work
+- stay within gate `allow`/`forbid`/`budget`
+- no manual runtime/cache/index I/O
+- no scope creep, fake checks, or unrelated merges

@@ -14,20 +14,13 @@ Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs
 
 ## Skill boundary
 
-This skill is terminal for this turn. Never read/execute another `c-*` skill. If needed, put it only under `next:` and stop; `next:` is inert text.
+Terminal turn. Do not read/execute another `c-*` skill. Put next command only under `next:`.
 
 ## Algo
 
 slice -> inspect files/tests/context -> resolve work item only if needed -> clarify gate -> test -> code -> targeted checks -> update resolved item -> out.
 
-For non-trivial changes:
-
-```text
-c-implement(slice:<name>)
-Plan: <step 1> -> <step 2> -> <checks>
-```
-
-Skip plan for trivial changes.
+For non-trivial changes, include the intended steps under `ev:` or `next:` in the final contract. Skip this for trivial changes.
 
 ## Gates
 
@@ -36,8 +29,9 @@ Ask max 3 only when missing info affects UX, public API, DB/migration, auth, bil
 Unknown project + commands needed + no probe -> stop:
 
 ```text
-c-implement(needs-takeover)
-Next: /c-takeover project
+c-implement(blocked)
+next:
+- /c-takeover project
 ```
 
 Use `project_probe.py` command suggestions only when present; otherwise inspect config and state uncertainty. No command guessing.
@@ -45,8 +39,9 @@ Use `project_probe.py` command suggestions only when present; otherwise inspect 
 Explicit continue/takeover/handed-off work -> stop unless takeover already completed:
 
 ```text
-c-implement(needs-takeover)
-Next: /c-takeover <work-item>
+c-implement(blocked)
+next:
+- /c-takeover <work-item>
 ```
 
 ## Work item I/O
@@ -64,6 +59,7 @@ No trivial work item. If resolved, update progress/files/evidence/risks/next. If
 Emit only the output shape below. No prose, no fence, no appendix. Stop after final field.
 Use short wrapped lines; put long values under bullets.
 
+
 ## Out
 
 c-implement(done|partial|blocked)
@@ -72,16 +68,14 @@ chg:
 - ...
 ev:
 - ...
-doc: none|path
+doc:
+- none
 risk:
 - ...
 next:
 - ...
 
-## Never
+## Guards
 
-- no scope creep
-- no unrelated refactor
-- no silent defaults for required values
-- no unjustified dependencies
-- no fake checks
+- no scope creep, unrelated refactor, or silent required defaults
+- no unjustified dependencies or fake checks

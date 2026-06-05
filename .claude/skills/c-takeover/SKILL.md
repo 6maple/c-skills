@@ -14,7 +14,7 @@ Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs
 
 ## Skill boundary
 
-This skill is terminal for this turn. Never read/execute another `c-*` skill. If needed, put it only under `next:` and stop; `next:` is inert text.
+Terminal turn. Do not read/execute another `c-*` skill. Put next command only under `next:`.
 
 ## Algo
 
@@ -60,11 +60,8 @@ risk:
 next:
 - /c-implement ...
 
-## Never
+## Guards
 
-- no source edits
-- no trust in prior summary without repo evidence
-- no manual cache/index reads/writes
-- no recursive work item scans
-- no expensive checks unless needed
-- no auto-merge of unrelated work
+- trust repo/tool stdout over prior summaries
+- keep checks targeted unless needed
+- do not merge unrelated work
