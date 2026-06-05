@@ -2,6 +2,7 @@
   "name": "c-skills",
   "skills": [
     "./.claude/skills/c-auto",
+    "./.claude/skills/c-auto-route",
     "./.claude/skills/c-clarify",
     "./.claude/skills/c-fix",
     "./.claude/skills/c-handoff",

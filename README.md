@@ -2,6 +2,24 @@
 
 极简、手动边界、证据优先。
 
+## Quickstart
+
+```bash
+npx skills@latest add https://github.com/6maple/c-skills.git
+```
+
+or
+
+```bash
+npx skills@latest add git@github.com:6maple/c-skills.git
+```
+
+or
+
+```bash
+npx skills@latest add https://github.com/6maple/c-skills.git -a claude-code
+```
+
 ## Daily
 
 ```text
