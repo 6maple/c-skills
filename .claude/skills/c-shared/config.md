@@ -1,0 +1,15 @@
+<config>
+  <docs>
+    <context_file>.docs/CONTEXT.md</context_file>
+    <adr_dir>.docs/adr</adr_dir>
+    <adr_template>.docs/adr/ADR-0000-template.md</adr_template>
+    <work_items_dir>.docs/work-items</work_items_dir>
+    <work_items_index>.docs/work-items/INDEX.csv</work_items_index>
+    <work_items_active_dir>.docs/work-items/active</work_items_active_dir>
+    <work_items_archive_dir>.docs/work-items/archive</work_items_archive_dir>
+    <work_item_template>.docs/work-items/.template.md</work_item_template>
+  </docs>
+  <runtime>
+    <data_dir>.cache/c-skills-data</data_dir>
+  </runtime>
+</config>
