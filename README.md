@@ -1,17 +1,16 @@
 # c-* Skills
 
-A c-* adaptation of Matt Pocock-style engineering skills with explicit user invocation, repo-local config, and `project_probe.py` evidence.
+A c-* adaptation of Matt Pocock-style engineering skills with explicit user invocation, repo-local config, and `project_probe.py` evidence. Skills are atomic; queue execution should be handled outside the skill layer.
 
 ## Main loop
 
 ```text
-c-auto-route -> c-auto -> project_probe.py -> specialist skill -> c-review/c-handoff
+c-auto-route -> specialist skill -> project_probe.py when needed -> c-review/c-handoff
 ```
 
 ## Skills
 
 - `c-auto-route`: route only.
-- `c-auto`: workflow manager.
 - `c-takeover`: establish trusted project state.
 - `c-grill`: one-question-at-a-time design alignment with CONTEXT/ADR updates.
 - `c-prd`: synthesize confirmed context into PRD.

@@ -1,6 +1,6 @@
 ---
 name: c-auto-route
-description: Route one user request to the next c-* skill. Use when the user wants automatic selection but not execution, or when c-auto needs a route-only decision.
+description: Route one user request to the next c-* skill. Use when the user wants automatic selection but not execution.
 disable-model-invocation: true
 ---
 
@@ -23,7 +23,7 @@ Pick exactly one next skill. Do not inspect the repo. Do not ask questions. Do n
 - architecture friction, shallow modules, missing seams -> `/c-arch`
 - review diff/branch/PR/current changes -> `/c-review`
 - save state for another session -> `/c-handoff`
-- multi-step autonomous goal -> `/c-auto`
+- multi-step goal that needs decomposition -> `/c-issues`
 
 ## Output
 
