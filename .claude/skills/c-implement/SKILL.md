@@ -22,6 +22,7 @@ Bounded implementation without mandatory RED phase.
 - Prefer existing patterns over new abstractions.
 - Do not mix bug fix, refactor, and feature unless the task explicitly requires it.
 - If the change is stable, testable, and high risk, route to `c-tdd`.
+- If the work is throwaway exploration or UI/state options, route to `c-prototype`.
 - If a design decision blocks implementation, route to `c-grill`.
 
 ## Output

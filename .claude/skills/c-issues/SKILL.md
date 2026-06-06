@@ -6,18 +6,48 @@ disable-model-invocation: true
 
 # c-issues
 
-Create thin vertical slices. Avoid horizontal layer tickets.
+Break work into independently grabbable tracer-bullet issues. Avoid horizontal layer tickets.
 
 ## Process
 
-1. Gather context from the passed PRD/spec/issue or current conversation.
-2. Explore the codebase only if needed to understand current seams.
-3. Draft tracer-bullet issues. Each slice cuts through all relevant integration layers and is independently verifiable.
-4. Mark each slice as:
-   - `AFK` — can be implemented and verified without user interaction.
-   - `HITL` — needs a human decision, design review, credential, environment, or approval.
-5. Ask for approval of the numbered breakdown before publishing local issue files.
-6. Publish approved issues under `{config.docs.issues_dir}` in dependency order.
+### 1. Gather context
+
+Work from the current conversation, passed PRD/spec/path, or referenced issue. If context is missing, stop and route to `c-grill`; do not invent scope.
+
+### 2. Explore codebase when needed
+
+Explore only enough to understand current seams and integration layers. Use project glossary terms and respect ADRs.
+
+### 3. Draft vertical slices
+
+Each issue is a thin vertical slice that cuts through all relevant integration layers end-to-end, not a horizontal slice of one layer.
+
+Rules:
+
+- Each slice delivers a narrow but complete path.
+- Each slice is demoable or independently verifiable.
+- Prefer many thin slices over few thick slices.
+- Prefer `AFK` over `HITL` when verification does not need the user.
+
+Mark each slice:
+
+- `AFK` — can be implemented and verified without user interaction.
+- `HITL` — requires user decision, design review, credential, environment, or approval.
+
+Choose execution:
+
+- `c-implement` — UI/volatile/exploratory or bounded non-TDD work.
+- `c-tdd` — stable, testable, high-risk behavior.
+- `c-fix` — bug/regression.
+- `c-refactor` — behavior-preserving structure change.
+
+### 4. Quiz the user
+
+Present the proposed breakdown as a numbered list. Ask whether to publish, split, merge, reorder, or change HITL/AFK.
+
+### 5. Publish
+
+Publish approved local issue files under `{config.docs.issues_dir}` in dependency order.
 
 ## Issue body
 

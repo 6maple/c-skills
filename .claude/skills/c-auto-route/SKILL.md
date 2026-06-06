@@ -14,7 +14,9 @@ Pick exactly one next skill. Do not inspect the repo. Do not ask questions. Do n
 - first-touch project, resume, takeover, unknown project state -> `/c-takeover`
 - new feature or cross-module product behavior -> `/c-prd`
 - approved PRD/spec/plan that needs tickets -> `/c-issues`
-- UI, frontend, exploratory, volatile, small local change -> `/c-implement`
+- prototype, mock up, state model sanity check, UI variants -> `/c-prototype`
+- unfamiliar code area, bigger-picture explanation, module/caller map -> `/c-zoom-out`
+- UI, frontend, volatile, small local change -> `/c-implement`
 - stable logic, API contract, high-risk behavior, test-first request -> `/c-tdd`
 - bug, regression, failing test, performance failure -> `/c-fix`
 - behavior-preserving cleanup, rename, move, small structure change -> `/c-refactor`

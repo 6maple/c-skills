@@ -16,6 +16,8 @@ c-auto-route -> c-auto -> project_probe.py -> specialist skill -> c-review/c-han
 - `c-grill`: one-question-at-a-time design alignment with CONTEXT/ADR updates.
 - `c-prd`: synthesize confirmed context into PRD.
 - `c-issues`: tracer-bullet vertical slices, HITL/AFK.
+- `c-prototype`: throwaway logic/UI prototypes to answer design questions.
+- `c-zoom-out`: explain a code area one abstraction level up.
 - `c-implement`: bounded non-TDD implementation.
 - `c-tdd`: red-green-refactor for stable/testable behavior.
 - `c-fix`: feedback-loop-first bug diagnosis.
@@ -45,5 +47,6 @@ Entry skills may be many. Execution paths stay few. Durable docs are written onl
 
 - `c-grill/CONTEXT-FORMAT.md` is consumed by `c-grill` when updating `{config.docs.context_file}`.
 - `c-grill/ADR-FORMAT.md` is consumed by `c-grill` when creating ADRs under `{config.docs.adr_dir}`.
-- `c-arch/LANGUAGE.md` is consumed by `c-arch` for deep-module architecture vocabulary.
+- `c-arch/LANGUAGE.md`, `HTML-REPORT.md`, and `INTERFACE-DESIGN.md` are consumed by `c-arch`.
+- `c-prototype/LOGIC.md` and `c-prototype/UI.md` are consumed by `c-prototype`.
 - `c-shared/SKILL.md` is intentionally frontmatter-only; use `.claude/skills/c-shared/config.md` for shared paths.

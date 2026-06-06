@@ -43,7 +43,9 @@ python .claude/skills/c-auto/c_auto.py checkpoint --status done|partial|blocked 
 - Missing design decision -> `c-grill`.
 - New feature without spec -> `c-prd`.
 - Spec needing tickets -> `c-issues`.
-- Volatile/UI/exploratory change -> `c-implement`.
+- Prototype/mock-up/state-model exploration -> `c-prototype`.
+- Need broader code context before acting -> `c-zoom-out`.
+- Volatile/UI bounded production change -> `c-implement`.
 - Stable/testable/high-risk behavior -> `c-tdd`.
 - Bug -> `c-fix`.
 - Refactor intent -> `c-refactor`.
