@@ -1,76 +1,58 @@
 ---
 name: c-auto
-description: Python-gated ReAct goal runner for one coding goal.
-disable-model-invocation: true
+description: Probe-first workflow manager for a single coding goal. Use when the user asks for multi-step automatic progress, wants the system to decide the next c-* skill, or says to handle the task end-to-end.
 ---
 
 # c-auto
 
-Run one goal through `c_auto.py`. The script controls phase, context budget, edit gate, and state.
+Run a bounded ReAct workflow. `c-auto` coordinates; it does not replace the specialist skills.
 
-Do not dispatch, read, or execute any other `c-*` skill.
+## Process
 
-## Start / step
+1. Run the deterministic gate:
 
-New goal:
-
+```bash
 python .claude/skills/c-auto/c_auto.py start --goal "<user task>"
+```
 
-Continue active goal:
+For continuation:
 
-python .claude/skills/c-auto/c_auto.py step --note "<new user input or short result>"
+```bash
+python .claude/skills/c-auto/c_auto.py step --note "<new user input or result>"
+```
 
-After a bounded action:
+2. Read `.claude/skills/c-shared/config.md`.
+3. Run `project_probe.py` before relying on stack, package manager, or commands:
 
-python .claude/skills/c-auto/c_auto.py checkpoint --status done|partial|blocked --summary "<short factual summary>"
+```bash
+python .claude/skills/c-takeover/project_probe.py
+```
 
-Reset only when user asks:
+4. Pick one specialist skill using gate output, probe evidence, and current artifacts.
+5. Do one bounded action only.
+6. After the action, checkpoint when useful:
 
-python .claude/skills/c-auto/c_auto.py reset
+```bash
+python .claude/skills/c-auto/c_auto.py checkpoint --status done|partial|blocked --summary "<fact>"
+```
 
-## Script stdout
+## Routing discipline
 
-`c_auto.py` emits `c-auto-gate(<phase>:<status>)`. This is a gate, not the final user response.
+- Missing project facts -> `c-takeover`.
+- Missing design decision -> `c-grill`.
+- New feature without spec -> `c-prd`.
+- Spec needing tickets -> `c-issues`.
+- Volatile/UI/exploratory change -> `c-implement`.
+- Stable/testable/high-risk behavior -> `c-tdd`.
+- Bug -> `c-fix`.
+- Refactor intent -> `c-refactor`.
+- Architecture smell -> `c-arch`.
+- Completed implementation -> `c-review`.
 
-After `start` or `step`:
+## Output
 
-- obey `allow`
-- stay within `forbid`
-- obey `budget`
-- one turn = one bounded action
-- if needed action is forbidden, stop as blocked
-- no client todo/task tool
-
-After a bounded action, run `checkpoint` when useful, then emit the final `c-auto(...)` response contract below.
-
-Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs.*}` paths.
-
-## Work item I/O
-
-Only when stdout allows checkpoint/state work:
-
-python .claude/skills/c-shared/work_items.py list
-python .claude/skills/c-shared/work_items.py resolve --active-only [<id-or-path>]
-python .claude/skills/c-shared/work_items.py create --title "<task>"
-python .claude/skills/c-shared/work_items.py set-status <id-or-path> <status>
-python .claude/skills/c-shared/work_items.py archive <id-or-path>
-
-Use stdout paths only. Do not scan work-items or edit `{config.docs.work_items_index}`.
-
-## Response contract
-
-Emit only the output shape below. No prose, no fence, no appendix. Stop after final field.
-Use short wrapped lines; put long values under bullets.
-
-List rules:
-
-- `q:` uses numbered questions when status is `ask`, otherwise `- none`
-- observations, actions, docs, risks, evidence, and `next:` use bullets
-- valid forms: use either `- none` or numbered items such as `1. ...`
-
-## Out
-
-c-auto(<phase>:done|partial|blocked|ask|checkpoint)
+```text
+c-auto(done|partial|blocked|ask)
 
 obs:
 - ...
@@ -88,9 +70,4 @@ risk:
 - none
 next:
 - <one default action>
-
-## Guards
-
-- stay within gate `allow`/`forbid`/`budget`
-- no manual runtime/cache/index I/O
-- no scope creep, fake checks, or unrelated merges
+```

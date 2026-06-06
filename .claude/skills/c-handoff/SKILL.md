@@ -1,58 +1,44 @@
 ---
 name: c-handoff
-description: Manual-only skill for saving compact continuation state.
-disable-model-invocation: true
+description: Compact current work into one handoff snapshot for a fresh agent. Use when the session is ending, context is too long, or another agent will continue the task.
+argument-hint: What will the next session focus on?
 ---
 
 # c-handoff
 
-Manual save-state for interruption, agent switch, or later continuation.
+Write one compact continuation snapshot. Reference existing artifacts instead of duplicating them.
 
-Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs.*}` paths.
+## Process
 
-## Skill boundary
+1. Read `.claude/skills/c-shared/config.md`.
+2. Summarize only current state needed by the next agent.
+3. Overwrite `{config.docs.handoff_file}`.
+4. Include the current issue path when one exists.
+5. Include suggested skill for the next session.
+6. Redact secrets, tokens, passwords, personal data, and environment-specific credentials.
 
-Terminal turn. Do not read/execute another `c-*` skill. Put next command only under `next:`.
+## Include
 
-## Algo
+- Current issue or goal.
+- Current state.
+- Confirmed decisions.
+- Changed files.
+- Verification status.
+- Open questions.
+- Risks.
+- Next recommended skill.
 
-diff -> relevant files -> `work_items.py list/resolve` -> patch resolved item or create if none -> set status/archive -> out.
+## Output
 
-```bash
-python .claude/skills/c-shared/work_items.py list
-python .claude/skills/c-shared/work_items.py resolve --active-only [<id-or-path>]
-python .claude/skills/c-shared/work_items.py create --title "<task>"
-python .claude/skills/c-shared/work_items.py set-status <id-or-path> <status>
-python .claude/skills/c-shared/work_items.py archive <id-or-path>
-```
-
-Use resolved path only. Create only when work is incomplete/complex and no active item exists. Multiple active items -> require explicit id/path; do not create another.
-
-Do not edit `{config.docs.work_items_index}`. Inspect only resolved/created item. Final status must be archived via `work_items.py archive`.
-
-## Record
-
-owner, branch, base commit, status, goal, progress, files, evidence, blockers, assumptions, risks, next.
-
-## Response contract
-
-Emit only the output shape below. No prose, no fence, no appendix. Stop after final field.
-Use short wrapped lines; put long values under bullets.
-
-
-## Out
-
+```text
 c-handoff(saved|blocked)
 
 doc:
-- {config.docs.work_items_active_dir}/<task>.md
-state: active|handed-off|blocked|done
+- .docs/HANDOFF.md
+state:
+- ...
 next:
-- ...
+- /c-takeover
 risk:
-- ...
-
-## Safety
-
-- include only current state, next step, risks, and evidence
-- omit secrets and unverified completed work/checks
+- none
+```

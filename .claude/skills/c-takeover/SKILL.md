@@ -1,67 +1,47 @@
 ---
 name: c-takeover
-description: Manual-only skill for verifying project/work state before continuing or first-touch coding.
-disable-model-invocation: true
+description: Establish a trusted project starting point before coding. Use for first-touch repos, resumed work, stale handoff snapshots, unknown project state, or when another c-* skill lacks stack/tooling evidence.
 ---
 
 # c-takeover
 
-Manual 接手校验. Trust nothing until verified. No source edits.
+Trust fresh repo evidence over prior summaries.
 
-Use for continue/take over/resume, explicit work item, or existing unknown/no-docs/first-touch project.
+## Process
 
-Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs.*}` paths.
-
-## Skill boundary
-
-Terminal turn. Do not read/execute another `c-*` skill. Put next command only under `next:`.
-
-## Algo
-
-probe -> work_items.py list/resolve -> read resolved item only -> git status/diff -> touched files -> evidence -> blockers/stale assumptions -> next.
-
-First commands:
+1. Read `.claude/skills/c-shared/config.md`.
+2. Run the probe:
 
 ```bash
 python .claude/skills/c-takeover/project_probe.py
-python .claude/skills/c-shared/work_items.py list
-python .claude/skills/c-shared/work_items.py resolve --active-only
-# explicit item only:
-python .claude/skills/c-shared/work_items.py resolve <id-or-path>
 ```
 
-Use `project_probe.py` stdout only; do not read/write runtime data under `{config.runtime.data_dir}`. Use `work_items.py` stdout only; read only the resolved path.
+3. Read `{config.docs.handoff_file}` if it exists.
+4. Inspect `{config.docs.issues_dir}` only for active issue status: `doing`, `blocked`, or explicitly referenced issue files.
+5. Read `CONTEXT`, ADR, PRD, issue, and source files only when directly relevant.
+6. Check `git status` and targeted diff when code may already be modified.
+7. Recommend exactly one next skill.
 
-`resolve --active-only` is default. No active item is valid for first-touch/project takeover. Multiple active items -> require user/reference selection; do not scan. Explicit item may include archived item via `resolve <id-or-path>`.
+## Rules
 
-If probe says `unknown` on new/empty project, stop with `next: /c-clarify stack-required`; do not guess stack/tooling.
+- If probe says unknown/new/empty, route to `c-grill`; do not guess stack or commands.
+- If several active issues exist, ask the user to choose by issue filename/path.
+- If `HANDOFF` conflicts with repo evidence, trust repo evidence and mark handoff stale.
+- Do not implement during takeover.
 
-Do not continue coding unless user explicitly asks after takeover or command includes continuation intent.
+## Output
 
-## Response contract
-
-Emit only the output shape below. No prose, no fence, no appendix. Stop after final field.
-Use short wrapped lines; put long values under bullets.
-
-## Out
-
+```text
 c-takeover(verified|dirty|blocked|stale|project)
 
 probe:
-- ...
-cmd:
 - ...
 state:
 - ...
 ev:
 - ...
 risk:
-- ...
+- none
 next:
-- /c-implement ...
-
-## Guards
-
-- trust repo/tool stdout over prior summaries
-- keep checks targeted unless needed
-- do not merge unrelated work
+- /c-skill ...
+```

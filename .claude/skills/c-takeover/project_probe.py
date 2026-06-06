@@ -16,8 +16,8 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
-SCHEMA = 3
-VERSION = "3.0.0"
+SCHEMA = 4
+VERSION = "3.1.0"
 CONFIG = Path(".claude/skills/c-shared/config.md")
 DEFAULT_DATA_DIR = Path(".cache/c-skills-data")
 DEFAULT_CACHE = DEFAULT_DATA_DIR / "project-probe.json"
@@ -345,6 +345,8 @@ def pick_os(v: Any) -> str | None:
 def command(
     root: Path, r: dict[str, Any], packages: dict[str, str], tools: dict[str, list[str]]
 ) -> str | None:
+    if ("any" in r or "all" in r) and not match(root, r):
+        return None
     tool = str(r.get("tool", ""))
     if tool:
         known = {x for vals in tools.values() for x in vals}
@@ -390,7 +392,17 @@ def detect_commands(
     return out
 
 
-def roots(root: Path, rules: dict[str, Any]) -> tuple[list[str], list[str]]:
+
+def detect_named_rules(root: Path, rules: dict[str, Any], key: str) -> list[str]:
+    out: list[str] = []
+    for r in rules.get(key, []):
+        if isinstance(r, dict) and match(root, r):
+            v = str(r.get("id") or r.get("name") or "")
+            if v and v not in out:
+                out.append(v)
+    return out
+
+def roots(root: Path, rules: dict[str, Any]) -> tuple[list[str], list[str], list[str]]:
     src = [
         p
         for p in rules.get("source_roots", [])
@@ -401,7 +413,12 @@ def roots(root: Path, rules: dict[str, Any]) -> tuple[list[str], list[str]]:
         for p in rules.get("test_roots", [])
         if isinstance(p, str) and (root / p).is_dir()
     ]
-    return src, tst
+    wsp = [
+        p
+        for p in rules.get("workspace_roots", [])
+        if isinstance(p, str) and (root / p).is_dir()
+    ]
+    return src, tst, wsp
 
 
 def evidence(root: Path, rules: dict[str, Any]) -> list[str]:
@@ -424,7 +441,8 @@ def analyze(root: Path, rules: dict[str, Any], cache_state: str) -> dict[str, An
     packages, risks = detect_packages(root, rules, stacks)
     tools = detect_tools(root, rules)
     commands = detect_commands(root, rules, packages, tools)
-    src, tst = roots(root, rules)
+    src, tst, wsp_roots = roots(root, rules)
+    workspaces = detect_named_rules(root, rules, "workspaces")
     ev = evidence(root, rules)
 
     semantic_stacks = [s for s in stacks if s != "docker"]
@@ -434,6 +452,8 @@ def analyze(root: Path, rules: dict[str, Any], cache_state: str) -> dict[str, An
         risks.append("unsupported or unrecognized project")
     if len(semantic_stacks) > 1:
         risks.append("mixed stack; inspect manually")
+    if workspaces:
+        risks.append("workspace/monorepo detected; prefer scoped commands when possible")
     if stacks != ["unknown"] and not commands:
         risks.append("no 100%-certain commands")
 
@@ -455,6 +475,8 @@ def analyze(root: Path, rules: dict[str, Any], cache_state: str) -> dict[str, An
         "tools": tools,
         "source_roots": src,
         "test_roots": tst,
+        "workspace_roots": wsp_roots,
+        "workspaces": workspaces,
         "commands": commands,
         "confidence": confidence,
         "unknowns": sorted(set(risks)),
@@ -470,13 +492,17 @@ def print_result(r: dict[str, Any]) -> None:
     print(f"- stack: {', '.join(r['stacks'])}")
     for k, v in sorted(r.get("packages", {}).items()):
         print(f"- package.{k}: {v}")
-    for k in ["test", "lint", "format", "typecheck"]:
-        if r.get("tools", {}).get(k):
-            print(f"- {k}: {', '.join(r['tools'][k])}")
+    for k, vals in sorted(r.get("tools", {}).items()):
+        if vals:
+            print(f"- {k}: {', '.join(vals)}")
     if r.get("source_roots"):
         print(f"- src: {', '.join(r['source_roots'])}")
     if r.get("test_roots"):
         print(f"- tests: {', '.join(r['test_roots'])}")
+    if r.get("workspaces"):
+        print(f"- workspace: {', '.join(r['workspaces'])}")
+    if r.get("workspace_roots"):
+        print(f"- workspace_roots: {', '.join(r['workspace_roots'])}")
     if r.get("commands"):
         print("\ncmd:")
         for k, v in sorted(r["commands"].items()):

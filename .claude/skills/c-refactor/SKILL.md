@@ -1,63 +1,39 @@
 ---
 name: c-refactor
-description: Manual-only skill for refactoring without behavior change.
-disable-model-invocation: true
+description: Thin entry for behavior-preserving code structure changes. Use for rename, move, cleanup, small mechanical refactor, or when the user explicitly asks to refactor.
 ---
 
 # c-refactor
 
 Change structure, not behavior.
 
-Continuation/unknown first touch -> `next: /c-takeover`.
+## Process
 
-Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs.*}` paths.
+1. Confirm the intended behavior is unchanged.
+2. Run `project_probe.py` before choosing commands.
+3. Identify the smallest safe mechanical step.
+4. Preserve public APIs unless the user explicitly requested an API change.
+5. Verify with existing tests/typecheck/lint/build.
+6. If a real architecture decision is needed, stop and route to `c-arch`.
 
-## Skill boundary
+## Routing
 
-Terminal turn. Do not read/execute another `c-*` skill. Put next command only under `next:`.
+- Mechanical local refactor -> proceed here.
+- Refactor requires behavior lock -> use `c-tdd` first.
+- Shallow modules, missing seams, or boundary redesign -> `c-arch`.
+- Bug discovered -> `c-fix`.
 
-## Algo
+## Output
 
-intent -> coverage/checks -> inspect patterns -> small mechanical steps -> checks -> update resolved item -> out.
-
-If behavior change is required, stop with `next: /c-implement` or `next: /c-fix`.
-
-## Gates
-
-Unknown project + commands needed + no probe -> stop with `next: /c-takeover`. Use `project_probe.py` command suggestions only when present; otherwise state uncertainty.
-
-Explicit continuation -> stop with `next: /c-takeover` unless already done.
-
-## Work item I/O
-
-```bash
-python .claude/skills/c-shared/work_items.py resolve --active-only [<id-or-path>]
-```
-
-Use stdout path only. Fail=no scan. None=skip update unless handoff is needed. Many=explicit id or `next: /c-takeover`.
-
-## Response contract
-
-Emit only the output shape below. No prose, no fence, no appendix. Stop after final field.
-Use short wrapped lines; put long values under bullets.
-
-
-## Out
-
+```text
 c-refactor(done|partial|blocked)
 
 chg:
 - ...
 ev:
 - ...
-doc:
-- none
 risk:
-- ...
+- none
 next:
-- ...
-
-## Guards
-
-- preserve behavior, public API, and dependencies unless explicit
-- defer required bug fixes instead of mixing work
+- none
+```

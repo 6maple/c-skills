@@ -1,16 +1,19 @@
 {
   "name": "c-skills",
   "skills": [
+    "./.claude/skills/c-arch",
     "./.claude/skills/c-auto",
     "./.claude/skills/c-auto-route",
-    "./.claude/skills/c-clarify",
     "./.claude/skills/c-fix",
+    "./.claude/skills/c-grill",
     "./.claude/skills/c-handoff",
     "./.claude/skills/c-implement",
-    "./.claude/skills/c-plan",
+    "./.claude/skills/c-issues",
+    "./.claude/skills/c-prd",
     "./.claude/skills/c-refactor",
     "./.claude/skills/c-review",
     "./.claude/skills/c-shared",
-    "./.claude/skills/c-takeover"
+    "./.claude/skills/c-takeover",
+    "./.claude/skills/c-tdd"
   ]
 }

@@ -1,37 +1,32 @@
 ---
 name: c-auto-route
-description: Manual route-only selector for the next c-* command.
+description: Route one user request to the next c-* skill. Use when the user wants automatic selection but not execution, or when c-auto needs a route-only decision.
 disable-model-invocation: true
 ---
 
 # c-auto-route
 
-Select one next command. Do not execute it.
+Pick exactly one next skill. Do not inspect the repo. Do not ask questions. Do not plan or execute.
 
-## Map
+## Routing
 
-new/empty project, stack unknown          -> /c-clarify
-unknown/no-docs/first-touch project       -> /c-takeover
-continue/takeover/resume                  -> /c-takeover
-architecture/design doc referenced        -> /c-plan
-new module/layer/public API                -> /c-plan
-cross-cutting or multi-file feature        -> /c-plan
-complex or high-risk feature              -> /c-plan
-small local clear edit                     -> /c-implement
-ambiguous/blocking feature                -> /c-clarify
-bug/error/failing test/regression          -> /c-fix
-refactor                                  -> /c-refactor
-review/diff-check                         -> /c-review
-handoff/save-state                         -> /c-handoff
-goal/multi-step auto mode                 -> /c-auto
-impossible route                           -> /c-clarify
+- unclear design, blocking ambiguity, vocabulary conflict -> `/c-grill`
+- first-touch project, resume, takeover, unknown project state -> `/c-takeover`
+- new feature or cross-module product behavior -> `/c-prd`
+- approved PRD/spec/plan that needs tickets -> `/c-issues`
+- UI, frontend, exploratory, volatile, small local change -> `/c-implement`
+- stable logic, API contract, high-risk behavior, test-first request -> `/c-tdd`
+- bug, regression, failing test, performance failure -> `/c-fix`
+- behavior-preserving cleanup, rename, move, small structure change -> `/c-refactor`
+- architecture friction, shallow modules, missing seams -> `/c-arch`
+- review diff/branch/PR/current changes -> `/c-review`
+- save state for another session -> `/c-handoff`
+- multi-step autonomous goal -> `/c-auto`
 
-## Response contract
+## Output
 
-Use request text only; no repo/doc/probe reads.
-Emit one slash command only. No prose, no fence, no appendix. Stop.
-Use the original task, tightened only when needed.
+Emit one slash command only.
 
-## Out
-
-/c-skill <task>
+```text
+/c-skill <tightened task>
+```

@@ -1,66 +1,38 @@
 ---
 name: c-fix
-description: Manual-only skill for bug fixes with a feedback loop.
-disable-model-invocation: true
+description: Disciplined bug diagnosis and fix loop. Use when the user reports a bug, failing test, runtime error, wrong behavior, crash, or performance regression.
 ---
 
 # c-fix
 
-Repro -> fix -> verify.
+A bug is not understood until there is a feedback loop. Fix inside this skill unless the task becomes a product/design decision or architecture redesign.
 
-Use for bugs, regressions, failing tests, runtime errors, wrong behavior. Continuation/unknown first touch -> `next: /c-takeover`.
+## Process
 
-Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs.*}` paths.
+1. Create the cheapest trustworthy pass/fail loop: failing test, CLI fixture, curl script, headless browser script, trace replay, throwaway harness, bisect, differential check, or HITL checklist.
+2. Reproduce the reported failure. If you cannot reproduce it, narrow the missing artifact/access and stop.
+3. Write 3-5 ranked falsifiable hypotheses.
+4. Test one hypothesis at a time. Temporary instrumentation must be easy to remove and tagged with a unique `[DEBUG-...]` prefix.
+5. Fix at the smallest correct seam. Do not mix unrelated refactor or feature work.
+6. Add a regression test when the behavior has a stable seam. When the seam is UI/integration and a test would be brittle, use build/typecheck/lint/smoke/manual checklist evidence instead.
+7. Re-run the original loop, relevant verification commands, and remove temporary instrumentation.
+8. If the fix exposes shallow modules or missing seams, finish the bug fix and recommend `c-arch` as follow-up.
 
-## Skill boundary
+## Output
 
-Terminal turn. Do not read/execute another `c-*` skill. Put next command only under `next:`.
-
-## Algo
-
-repro -> minimize -> inspect -> cause -> regression test if practical -> smallest fix -> checks -> remove debug logs -> update resolved item -> out.
-
-## Gates
-
-Unknown project + commands needed + no probe -> stop with `next: /c-takeover`. Use `project_probe.py` command suggestions only when present; otherwise inspect config and state uncertainty.
-
-Explicit continue/takeover/handed-off item -> stop with `next: /c-takeover` unless already done.
-
-## Work item I/O
-
-```bash
-python .claude/skills/c-shared/work_items.py resolve --active-only [<id-or-path>]
-```
-
-Use stdout path only. Fail=no scan. None=skip update unless handoff is needed. Many=explicit id or `next: /c-takeover`.
-
-No trivial work item. Update resolved item. Incomplete handoff -> recommend `c-handoff`.
-
-## Response contract
-
-Emit only the output shape below. No prose, no fence, no appendix. Stop after final field.
-Use short wrapped lines; put long values under bullets.
-
-
-## Out
-
+```text
 c-fix(done|partial|blocked)
 
+loop:
+- ...
 cause:
 - ...
 fix:
 - ...
 ev:
 - ...
-doc:
-- none
 risk:
-- ...
+- none
 next:
-- ...
-
-## Guards
-
-- fix only the reported/reproven bug
-- no unrelated refactor or public behavior change beyond the bug
-- no fake checks or leftover debug logs
+- none
+```

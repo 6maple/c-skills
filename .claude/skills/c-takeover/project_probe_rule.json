@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "rule_version": "3.0.0",
+  "rule_version": "3.1.0",
   "tracked_patterns": [
     "pyproject.toml",
     "uv.lock",
@@ -78,7 +78,18 @@
     "**/*.cs",
     "**/*.php",
     "**/*.rb",
-    "**/*.swift"
+    "**/*.swift",
+    "pnpm-workspace.yaml",
+    "turbo.json",
+    "nx.json",
+    "lerna.json",
+    "rush.json",
+    "melos.yaml",
+    "apps/*/package.json",
+    "packages/*/package.json",
+    "services/*/package.json",
+    "apps/*/pubspec.yaml",
+    "packages/*/pubspec.yaml"
   ],
   "evidence_patterns": [
     "pyproject.toml",
@@ -137,7 +148,18 @@
     "Makefile",
     "Dockerfile",
     "docker-compose.yml",
-    "docker-compose.yaml"
+    "docker-compose.yaml",
+    "pnpm-workspace.yaml",
+    "turbo.json",
+    "nx.json",
+    "lerna.json",
+    "rush.json",
+    "melos.yaml",
+    "apps/*/package.json",
+    "packages/*/package.json",
+    "services/*/package.json",
+    "apps/*/pubspec.yaml",
+    "packages/*/pubspec.yaml"
   ],
   "source_roots": [
     "src",
@@ -1074,6 +1096,153 @@
           "path": "Package.swift"
         }
       ]
+    },
+    {
+      "id": "package-json-build",
+      "kind": "build",
+      "scope": "node",
+      "any": [
+        {
+          "json_script": {
+            "path": "package.json",
+            "name": "build"
+          }
+        }
+      ]
+    },
+    {
+      "id": "package-json-preview",
+      "kind": "smoke",
+      "scope": "node",
+      "any": [
+        {
+          "json_script": {
+            "path": "package.json",
+            "name": "preview"
+          }
+        }
+      ]
+    },
+    {
+      "id": "turbo",
+      "kind": "workspace",
+      "scope": "node",
+      "any": [
+        {
+          "path": "turbo.json"
+        }
+      ]
+    },
+    {
+      "id": "nx",
+      "kind": "workspace",
+      "scope": "node",
+      "any": [
+        {
+          "path": "nx.json"
+        }
+      ]
+    },
+    {
+      "id": "melos",
+      "kind": "workspace",
+      "scope": "flutter",
+      "any": [
+        {
+          "path": "melos.yaml"
+        }
+      ]
+    },
+    {
+      "id": "flutter-analyze",
+      "kind": "lint",
+      "scope": "flutter",
+      "any": [
+        {
+          "file_contains": {
+            "path": "pubspec.yaml",
+            "regex": "(?m)^\\s{0,4}sdk:\\s*flutter\\s*$"
+          }
+        }
+      ]
+    },
+    {
+      "id": "flutter-build-web",
+      "kind": "build",
+      "scope": "flutter",
+      "all": [
+        {
+          "file_contains": {
+            "path": "pubspec.yaml",
+            "regex": "(?m)^\\s{0,4}sdk:\\s*flutter\\s*$"
+          }
+        },
+        {
+          "path": "web"
+        }
+      ]
+    },
+    {
+      "id": "dart-analyze",
+      "kind": "lint",
+      "scope": "dart",
+      "any": [
+        {
+          "path": "analysis_options.yaml"
+        },
+        {
+          "path": "pubspec.yaml"
+        }
+      ]
+    },
+    {
+      "id": "go-build",
+      "kind": "build",
+      "scope": "go",
+      "any": [
+        {
+          "path": "go.mod"
+        }
+      ]
+    },
+    {
+      "id": "cargo-build",
+      "kind": "build",
+      "scope": "rust",
+      "any": [
+        {
+          "path": "Cargo.toml"
+        }
+      ]
+    },
+    {
+      "id": "dotnet-build",
+      "kind": "build",
+      "scope": "dotnet",
+      "any": [
+        {
+          "glob": "*.sln"
+        },
+        {
+          "glob": "*.csproj"
+        },
+        {
+          "glob": "*.fsproj"
+        },
+        {
+          "glob": "*.vbproj"
+        }
+      ]
+    },
+    {
+      "id": "swift-build",
+      "kind": "build",
+      "scope": "swift",
+      "any": [
+        {
+          "path": "Package.swift"
+        }
+      ]
     }
   ],
   "commands": [
@@ -1318,6 +1487,165 @@
       "scope": "swift",
       "tool": "swift-test",
       "command": "swift test"
+    },
+    {
+      "id": "node.build",
+      "kind": "build",
+      "scope": "node",
+      "tool": "package-json-build",
+      "package_script": "build"
+    },
+    {
+      "id": "node.preview",
+      "kind": "smoke",
+      "scope": "node",
+      "tool": "package-json-preview",
+      "package_script": "preview"
+    },
+    {
+      "id": "go.build",
+      "kind": "build",
+      "scope": "go",
+      "tool": "go-build",
+      "command": "go build ./..."
+    },
+    {
+      "id": "rust.build",
+      "kind": "build",
+      "scope": "rust",
+      "tool": "cargo-build",
+      "command": "cargo build"
+    },
+    {
+      "id": "flutter.analyze",
+      "kind": "lint",
+      "scope": "flutter",
+      "tool": "flutter-analyze",
+      "command": "flutter analyze"
+    },
+    {
+      "id": "flutter.build-web",
+      "kind": "build",
+      "scope": "flutter",
+      "tool": "flutter-build-web",
+      "command": "flutter build web"
+    },
+    {
+      "id": "dart.analyze",
+      "kind": "lint",
+      "scope": "dart",
+      "tool": "dart-analyze",
+      "command": "dart analyze"
+    },
+    {
+      "id": "dotnet.build",
+      "kind": "build",
+      "scope": "dotnet",
+      "tool": "dotnet-build",
+      "command": "dotnet build"
+    },
+    {
+      "id": "swift.build",
+      "kind": "build",
+      "scope": "swift",
+      "tool": "swift-build",
+      "command": "swift build"
+    },
+    {
+      "id": "java.maven.build",
+      "name": "java.build",
+      "kind": "build",
+      "scope": "java",
+      "tool": "java-test",
+      "templates": {
+        "maven-wrapper": {
+          "posix": "./mvnw verify",
+          "windows": "mvnw.cmd verify"
+        },
+        "maven": "mvn verify"
+      }
+    },
+    {
+      "id": "java.gradle.build",
+      "name": "java.build",
+      "kind": "build",
+      "scope": "java",
+      "tool": "java-test",
+      "templates": {
+        "gradle-wrapper": {
+          "posix": "./gradlew build",
+          "windows": "gradlew.bat build"
+        },
+        "gradle": "gradle build"
+      }
+    }
+  ],
+  "workspace_roots": [
+    "apps",
+    "packages",
+    "services",
+    "libs",
+    "modules"
+  ],
+  "workspaces": [
+    {
+      "id": "pnpm-workspace",
+      "any": [
+        {
+          "path": "pnpm-workspace.yaml"
+        }
+      ]
+    },
+    {
+      "id": "package-json-workspaces",
+      "any": [
+        {
+          "file_contains": {
+            "path": "package.json",
+            "regex": "\"workspaces\"\\s*:"
+          }
+        }
+      ]
+    },
+    {
+      "id": "turbo",
+      "any": [
+        {
+          "path": "turbo.json"
+        }
+      ]
+    },
+    {
+      "id": "nx",
+      "any": [
+        {
+          "path": "nx.json"
+        }
+      ]
+    },
+    {
+      "id": "lerna",
+      "any": [
+        {
+          "path": "lerna.json"
+        }
+      ]
+    },
+    {
+      "id": "rush",
+      "any": [
+        {
+          "path": "rush.json"
+        }
+      ]
+    },
+    {
+      "id": "melos",
+      "any": [
+        {
+          "path": "melos.yaml"
+        }
+      ]
     }
   ]
 }

@@ -1,51 +1,39 @@
 ---
 name: c-review
-description: Manual-only skill for reviewing current diffs or requested files.
-disable-model-invocation: true
+description: Review changes along two axes: Standards and Spec. Use when the user wants to review a branch, PR, current diff, or work-in-progress changes.
 ---
 
 # c-review
 
-Review diff/files. No edits unless explicitly asked.
+Review as if you are a fresh agent. Do not rely on the implementation conversation.
 
-Before doc I/O, read `.claude/skills/c-shared/config.md`; use only `{config.docs.*}` paths.
+## Process
 
-## Skill boundary
+1. Pin the fixed point. If unspecified, ask what to review against: branch, commit, tag, or `main`.
+2. Capture:
 
-Terminal turn. Do not read/execute another `c-*` skill. Put next command only under `next:`.
+```bash
+git diff <fixed-point>...HEAD
+git log <fixed-point>..HEAD --oneline
+```
 
-## Algo
+3. Identify the spec source in order: issue reference, user-passed path, PRD/spec under docs, matching local issue, or none.
+4. Run two independent axes:
+   - Standards — repo conventions, architecture, tests, type safety, complexity, security, docs.
+   - Spec — whether the diff implements the originating issue/PRD/spec.
+5. Aggregate findings. Prefer correctness and scope risks over style noise.
 
-diff -> surrounding code if needed -> correctness/tests/scope/security/docs -> blocking/minor -> minimal fixes/checks.
+## Output
 
-Check: correctness, tests, complexity, public behavior, security, docs mismatch, unrelated changes, hidden defaults, unjustified deps.
+```text
+c-review(pass|changes-requested|blocked)
 
-## Response contract
-
-Emit only the output shape below. No prose, no fence, no appendix. Stop after final field.
-Use short wrapped lines; put long values under bullets.
-
-List rules:
-
-- `blocking:` and `minor:` use numbered findings when present, otherwise `- none`
-- `blocking:<n>` and `minor:<n>` must equal their numbered findings
-- evidence and `next:` use bullets
-- valid forms: use either `- none` or numbered items such as `1. ...`
-
-## Out
-
-c-review(clean|blocking:<n>,minor:<n>)
-
-blocking:
-- none
-minor:
-- none
+spec:
+1. none
+standards:
+1. none
 ev:
-- checks/reviewed files
+- ...
 next:
 - none
-
-## Guards
-
-- report correctness/scope risks; skip harmless style noise
-- suggest minimal fixes, not redesigns
+```
