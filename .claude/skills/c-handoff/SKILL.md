@@ -2,6 +2,7 @@
 name: c-handoff
 description: Compact current work into one handoff snapshot for a fresh agent. Use when the session is ending, context is too long, or another agent will continue the task.
 argument-hint: What will the next session focus on?
+disable-model-invocation: true
 ---
 
 # c-handoff

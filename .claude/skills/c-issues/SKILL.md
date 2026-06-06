@@ -1,6 +1,7 @@
 ---
 name: c-issues
 description: Break a PRD, spec, or plan into tracer-bullet vertical issues. Use when approved work needs independently grabbable HITL/AFK slices.
+disable-model-invocation: true
 ---
 
 # c-issues
@@ -36,6 +37,7 @@ updated: YYYY-MM-DD
 ## What to build
 
 ## Acceptance Criteria
+
 - [ ] ...
 
 ## Verification

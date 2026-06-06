@@ -1,6 +1,7 @@
 ---
 name: c-tdd
 description: Test-driven development with a red-green-refactor loop. Use for stable, testable, high-risk behavior, core logic, API contracts, regressions, or when the user asks for TDD/test-first development.
+disable-model-invocation: true
 ---
 
 # c-tdd

@@ -1,6 +1,7 @@
 ---
 name: c-refactor
 description: Thin entry for behavior-preserving code structure changes. Use for rename, move, cleanup, small mechanical refactor, or when the user explicitly asks to refactor.
+disable-model-invocation: true
 ---
 
 # c-refactor

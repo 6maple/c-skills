@@ -1,6 +1,7 @@
 ---
 name: c-prd
 description: Turn confirmed context into a PRD. Use when a new feature or cross-module change needs a durable product/engineering spec before issue slicing.
+disable-model-invocation: true
 ---
 
 # c-prd
@@ -25,6 +26,7 @@ Synthesize what is already known. Do not interview the user; if essential inform
 ## Solution
 
 ## User Stories
+
 1. As a ..., I want ..., so that ...
 
 ## Implementation Decisions

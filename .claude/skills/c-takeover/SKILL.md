@@ -1,6 +1,7 @@
 ---
 name: c-takeover
 description: Establish a trusted project starting point before coding. Use for first-touch repos, resumed work, stale handoff snapshots, unknown project state, or when another c-* skill lacks stack/tooling evidence.
+disable-model-invocation: true
 ---
 
 # c-takeover

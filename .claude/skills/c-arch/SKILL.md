@@ -1,6 +1,7 @@
 ---
 name: c-arch
 description: Find codebase deepening opportunities using project domain language and ADRs. Use for architecture friction, shallow modules, missing seams, excessive coupling, or refactoring strategy.
+disable-model-invocation: true
 ---
 
 # c-arch

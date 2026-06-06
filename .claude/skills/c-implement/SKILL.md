@@ -1,6 +1,7 @@
 ---
 name: c-implement
 description: Implement one bounded non-TDD slice. Use for UI, frontend, volatile requirements, exploratory integration, small local edits, or changes where test-first would create brittle low-value tests.
+disable-model-invocation: true
 ---
 
 # c-implement

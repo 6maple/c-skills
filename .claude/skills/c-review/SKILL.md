@@ -1,6 +1,7 @@
 ---
 name: c-review
 description: Review changes along two axes: Standards and Spec. Use when the user wants to review a branch, PR, current diff, or work-in-progress changes.
+disable-model-invocation: true
 ---
 
 # c-review

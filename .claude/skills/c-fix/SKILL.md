@@ -1,6 +1,7 @@
 ---
 name: c-fix
 description: Disciplined bug diagnosis and fix loop. Use when the user reports a bug, failing test, runtime error, wrong behavior, crash, or performance regression.
+disable-model-invocation: true
 ---
 
 # c-fix

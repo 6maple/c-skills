@@ -1,6 +1,7 @@
 ---
 name: c-auto
 description: Probe-first workflow manager for a single coding goal. Use when the user asks for multi-step automatic progress, wants the system to decide the next c-* skill, or says to handle the task end-to-end.
+disable-model-invocation: true
 ---
 
 # c-auto

@@ -1,6 +1,7 @@
 ---
 name: c-grill
 description: Challenge a plan or unclear task against the project's domain language and decisions. Use when requirements are ambiguous, a design needs stress-testing, or a blocking decision must be resolved before implementation.
+disable-model-invocation: true
 ---
 
 # c-grill
