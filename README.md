@@ -1,5 +1,7 @@
 # c-* Skills
 
+中文说明见 [README.zh-CN.md](README.zh-CN.md)。
+
 A c-* adaptation of Matt Pocock-style engineering skills with explicit user invocation, repo-local config, and `project_probe.py` evidence. Skills are atomic; queue execution should be handled outside the skill layer.
 
 ## Main loop
@@ -17,6 +19,7 @@ c-auto-route -> specialist skill -> project_probe.py when needed -> c-review/c-h
 - `c-issues`: tracer-bullet vertical slices, HITL/AFK.
 - `c-prototype`: throwaway logic/UI prototypes to answer design questions.
 - `c-zoom-out`: explain a code area one abstraction level up.
+- `c-clean`: clean stale configured docs after confirmation.
 - `c-implement`: bounded non-TDD implementation.
 - `c-tdd`: red-green-refactor for stable/testable behavior.
 - `c-fix`: feedback-loop-first bug diagnosis.
@@ -58,23 +61,37 @@ Resolve all paths from `.claude/skills/c-shared/config.md`. Defaults are under `
 
 ## Document hygiene
 
-Configured docs are working assets, not an append-only knowledge base. Run a hygiene pass after a feature ships, before long-task takeover, or when configured docs become noisy. `c-takeover` performs a lightweight hygiene check and reports candidates; deletion or archiving needs explicit user approval.
+Configured docs are working assets, not an append-only knowledge base. Clean them after a feature ships, before long-task takeover, or when configured docs become noisy.
+
+Use `/c-clean` for skill-based cleanup. It lists cleanup candidates, asks for confirmation, then deletes only confirmed files. Keep its output short.
+
+Utility script for user-only manual cleanup:
+
+```bash
+python .claude/skills/c-shared/doc_hygiene.py
+python .claude/skills/c-shared/doc_hygiene.py -y
+```
+
+Behavior:
+
+- default: list candidates, then delete only after the user types `y`.
+- `-y` / `--yes`: delete candidates without interactive confirmation.
+- This script is only for users to call manually. Skills should not depend on it.
+
+Default cleanup candidates:
+
+- `done` issues under `{config.docs.issues_dir}` older than 14 days.
+- orphan PRDs under `{config.docs.prd_dir}` older than 30 days and not referenced by active issues.
+- ADRs under `{config.docs.adr_dir}` marked `superseded` and older than 90 days.
+- stale `{config.docs.handoff_file}` older than 7 days.
 
 Keep:
 
 - current vocabulary in `{config.docs.context_file}`
 - accepted ADRs that still affect decisions
-- active `todo`, `doing`, or `blocked` issues
+- active `todo`, `doing`, `blocked`, or `ready` issues
 - PRDs tied to active work
 - the single current `{config.docs.handoff_file}`
-
-Clean up or archive:
-
-- `done` issues after review/merge when no longer useful
-- PRDs whose issues are all done or abandoned
-- ADRs marked `superseded` after the replacement ADR is clear
-- stale handoff content by overwriting `{config.docs.handoff_file}`
-- generated reports/prototypes that are no longer referenced
 
 Do not load all configured docs by default. Read only files directly relevant to the current issue, touched code area, or active handoff.
 

@@ -21,7 +21,7 @@ python .claude/skills/c-takeover/project_probe.py
 4. Inspect `{config.docs.issues_dir}` only for active issue status: `doing`, `blocked`, or explicitly referenced issue files.
 5. Read `{config.docs.context_file}`, ADR, PRD, issue, and source files only when directly relevant. Prefer `{config.docs.context_file}` for vocabulary; treat PRD, issues, ADRs, and handoff as dated intent/decisions until confirmed by code.
 6. Check `git status`, targeted diff, source files, and available tests/build evidence before trusting docs.
-7. Run a lightweight document hygiene check over configured docs paths. Do not read every document in full; identify stale candidates by issue status, age, superseded ADR status, orphan PRDs, and handoff freshness.
+7. If configured docs look noisy or stale, recommend `/c-clean`. Do not delete docs during takeover.
 8. Recommend exactly one next skill.
 
 ## Rules
@@ -42,8 +42,6 @@ state:
 - ...
 ev:
 - ...
-docs_hygiene:
-- none
 risk:
 - none
 next:

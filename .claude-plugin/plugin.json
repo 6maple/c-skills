@@ -3,6 +3,7 @@
   "skills": [
     "./.claude/skills/c-arch",
     "./.claude/skills/c-auto-route",
+    "./.claude/skills/c-clean",
     "./.claude/skills/c-fix",
     "./.claude/skills/c-grill",
     "./.claude/skills/c-handoff",
