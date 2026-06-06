@@ -8,6 +8,10 @@ disable-model-invocation: true
 
 Review as if you are a fresh agent. Do not rely on the implementation conversation.
 
+## Evidence precedence
+
+Use configured docs as intent and vocabulary. Current source code, tests, typecheck/build output, and git diff are stronger evidence than stale `{config.docs.root_dir}` text.
+
 ## Process
 
 1. Pin the fixed point. If unspecified, ask what to review against: branch, commit, tag, or `main`.

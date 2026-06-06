@@ -1,5 +1,7 @@
 # HANDOFF
 
+Trust: continuation hint only; verify against repo evidence.
+
 Current issue: none
 
 ## State

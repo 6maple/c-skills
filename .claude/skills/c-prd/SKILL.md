@@ -8,6 +8,10 @@ disable-model-invocation: true
 
 Synthesize what is already known. Do not interview the user; if essential information is missing, route to `c-grill`.
 
+## Evidence precedence
+
+Treat configured docs as context, not proof. Prefer current code and verified behavior when they conflict with old `{config.docs.root_dir}` content.
+
 ## Process
 
 1. Read `.claude/skills/c-shared/config.md`.
@@ -45,7 +49,7 @@ Implementation decisions describe modules, interfaces, contracts, schema, intera
 c-prd(done|blocked)
 
 doc:
-- .docs/prd/<file>.md
+- {config.docs.prd_dir}/<file>.md
 ev:
 - ...
 risk:

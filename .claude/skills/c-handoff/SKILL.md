@@ -7,7 +7,7 @@ disable-model-invocation: true
 
 # c-handoff
 
-Write one compact continuation snapshot. Reference existing artifacts instead of duplicating them.
+Write one compact continuation snapshot. Reference existing artifacts instead of duplicating them. Handoff is a short-lived continuation hint, not a source of truth.
 
 ## Process
 
@@ -15,8 +15,9 @@ Write one compact continuation snapshot. Reference existing artifacts instead of
 2. Summarize only current state needed by the next agent.
 3. Overwrite `{config.docs.handoff_file}`.
 4. Include the current issue path when one exists.
-5. Include suggested skill for the next session.
-6. Redact secrets, tokens, passwords, personal data, and environment-specific credentials.
+5. Include the issue status if an issue is active.
+6. Include suggested skill for the next session.
+7. Redact secrets, tokens, passwords, personal data, and environment-specific credentials.
 
 ## Include
 
@@ -35,7 +36,7 @@ Write one compact continuation snapshot. Reference existing artifacts instead of
 c-handoff(saved|blocked)
 
 doc:
-- .docs/HANDOFF.md
+- {config.docs.handoff_file}
 state:
 - ...
 next:

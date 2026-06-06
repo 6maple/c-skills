@@ -1,7 +1,10 @@
 # ADR-0000: <decision>
 
 ## Status
-Proposed
+proposed | accepted | superseded
+
+## Date
+YYYY-MM-DD
 
 ## Context
 

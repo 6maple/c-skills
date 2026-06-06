@@ -1,5 +1,6 @@
 <config>
   <docs>
+    <root_dir>.docs</root_dir>
     <context_file>.docs/CONTEXT.md</context_file>
     <adr_dir>.docs/adr</adr_dir>
     <prd_dir>.docs/prd</prd_dir>

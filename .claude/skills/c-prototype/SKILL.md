@@ -8,6 +8,10 @@ disable-model-invocation: true
 
 A prototype is throwaway code that answers a question. The question decides the shape.
 
+## Evidence precedence
+
+Use configured docs as intent and vocabulary. Current source code and runnable prototype evidence beat stale `{config.docs.root_dir}` text.
+
 ## Pick a branch
 
 Identify the question being answered:
@@ -31,6 +35,15 @@ If ambiguous and the user is unavailable, choose the branch that best matches th
 
 The answer is the only durable artifact. Capture it in a commit message, ADR, issue, or `NOTES.md` next to the prototype. If the user is present, ask what decision the prototype produced.
 
+## Issue status writeback
+
+If invoked with an issue file path, update that file before final output.
+
+- On success: set frontmatter `status: done`, update `updated: YYYY-MM-DD`, and refresh the `## Result` section with changed files, verification evidence, and short notes.
+- On stop/block: set `status: blocked`, update `updated: YYYY-MM-DD`, and refresh the `## Blocked` section with reason, tried steps, and exact next action.
+- Do not leave a completed or stopped issue as `todo`.
+- Do not write long logs into the issue. Keep details in final response or verification output.
+
 ## Output
 
 ```text
@@ -46,6 +59,8 @@ artifact:
 - ...
 answer:
 - pending|...
+issue:
+- none|updated <issue-path> to done|blocked
 risk:
 - prototype code must be deleted or absorbed
 next:

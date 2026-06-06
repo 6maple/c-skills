@@ -1,6 +1,6 @@
-# CONTEXT.md Format
+# Context File Format
 
-`CONTEXT.md` is a glossary, not a spec or scratchpad.
+The configured context file is a glossary, not a spec or scratchpad.
 
 Use entries like:
 

@@ -27,6 +27,10 @@ RED -> GREEN: behavior 2
 RED -> GREEN: behavior 3
 ```
 
+## Evidence precedence
+
+Use configured docs as intent and vocabulary. Current source code, tests, typecheck/build output, and git diff are stronger evidence than stale `{config.docs.root_dir}` text.
+
 ## Workflow
 
 ### 1. Planning
@@ -67,6 +71,15 @@ Refactor only while GREEN. Deepen modules where useful. Run tests after each ref
 - [ ] Code is minimal for this test.
 - [ ] No speculative feature was added.
 
+## Issue status writeback
+
+If invoked with an issue file path, update that file before final output.
+
+- On success: set frontmatter `status: done`, update `updated: YYYY-MM-DD`, and refresh the `## Result` section with changed files, verification evidence, and short notes.
+- On stop/block: set `status: blocked`, update `updated: YYYY-MM-DD`, and refresh the `## Blocked` section with reason, tried steps, and exact next action.
+- Do not leave a completed or stopped issue as `todo`.
+- Do not write long logs into the issue. Keep details in final response or verification output.
+
 ## Output
 
 ```text
@@ -80,8 +93,10 @@ refactor:
 - none
 ev:
 - ...
+issue:
+- none|updated <issue-path> to done|blocked
 risk:
 - none
 next:
-- none
+- none|/c-review <issue-path>
 ```

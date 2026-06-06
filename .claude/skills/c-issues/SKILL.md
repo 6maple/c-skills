@@ -8,6 +8,10 @@ disable-model-invocation: true
 
 Break work into independently grabbable tracer-bullet issues. Avoid horizontal layer tickets.
 
+## Evidence precedence
+
+Treat configured docs as context, not proof. Prefer current code and verified behavior when they conflict with old `{config.docs.root_dir}` content.
+
 ## Process
 
 ### 1. Gather context
@@ -72,7 +76,31 @@ updated: YYYY-MM-DD
 ## Verification
 
 ## Risk
+
+## Result
+
+- status: todo
+- changed: none
+- verification: none
+- notes: none
+
+## Blocked
+
+- reason: none
+- tried: none
+- next: none
 ```
+
+## Status contract
+
+Issue files under `{config.docs.issues_dir}` are the local status source. They are task contracts, not execution logs. Execution skills update only `status`, `updated`, and the compact `Result` or `Blocked` section. Do not append long transcripts.
+
+Status semantics:
+
+- `todo` — not started.
+- `doing` — reserved for external runners or active manual execution.
+- `done` — acceptance criteria met and relevant verification passed.
+- `blocked` — missing information, missing environment, failed verification, or unsafe to continue.
 
 ## Output
 

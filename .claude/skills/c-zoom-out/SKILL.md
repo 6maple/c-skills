@@ -8,6 +8,10 @@ disable-model-invocation: true
 
 Go up one layer of abstraction. Do not implement.
 
+## Evidence precedence
+
+Treat configured docs as context, not proof. Prefer current code and verified behavior when they conflict with old `{config.docs.root_dir}` content.
+
 ## Process
 
 1. Read `.claude/skills/c-shared/config.md`.

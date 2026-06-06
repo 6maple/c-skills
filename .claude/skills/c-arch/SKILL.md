@@ -14,6 +14,10 @@ Use [LANGUAGE.md](./LANGUAGE.md) exactly. Architecture vocabulary consistency is
 
 Use project domain terms from `{config.docs.context_file}`. Respect ADRs under `{config.docs.adr_dir}`.
 
+## Evidence precedence
+
+Treat configured docs as context, not proof. Prefer current code and verified behavior when they conflict with old `{config.docs.root_dir}` content.
+
 ## Process
 
 ### 1. Explore
