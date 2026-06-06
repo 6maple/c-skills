@@ -1,6 +1,6 @@
 # c-* Skills
 
-Probe-first, asset-driven, bounded AI coding workflow inspired by Matt Pocock's skill style.
+A c-* adaptation of Matt Pocock-style engineering skills with explicit user invocation, repo-local config, and `project_probe.py` evidence.
 
 ## Main loop
 
@@ -23,7 +23,7 @@ c-auto-route -> c-auto -> project_probe.py -> specialist skill -> c-review/c-han
 - `c-arch`: deep-module architecture review.
 - `c-review`: fresh-context two-axis review.
 - `c-handoff`: compact continuation state.
-- `c-shared`: shared config.
+- `c-shared`: placeholder skill only; shared values live in `config.md`.
 
 
 ## Artifacts
@@ -39,3 +39,11 @@ c-auto-route -> c-auto -> project_probe.py -> specialist skill -> c-review/c-han
 ## Principle
 
 Entry skills may be many. Execution paths stay few. Durable docs are written only when they will be reused. Small one-shot changes should produce repo evidence, verification output, or a clear user question, not extra files.
+
+
+## Matt-style assets
+
+- `c-grill/CONTEXT-FORMAT.md` is consumed by `c-grill` when updating `{config.docs.context_file}`.
+- `c-grill/ADR-FORMAT.md` is consumed by `c-grill` when creating ADRs under `{config.docs.adr_dir}`.
+- `c-arch/LANGUAGE.md` is consumed by `c-arch` for deep-module architecture vocabulary.
+- `c-shared/SKILL.md` is intentionally frontmatter-only; use `.claude/skills/c-shared/config.md` for shared paths.

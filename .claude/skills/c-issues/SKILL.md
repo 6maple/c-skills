@@ -37,7 +37,6 @@ updated: YYYY-MM-DD
 ## What to build
 
 ## Acceptance Criteria
-
 - [ ] ...
 
 ## Verification

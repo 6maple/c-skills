@@ -24,10 +24,11 @@ Create docs lazily. Write only when a term or decision actually crystallises.
 - Sharpen vague language into one canonical term.
 - Use concrete scenarios to expose boundary problems.
 - Cross-check user claims with code when cheap.
-- Update `CONTEXT.md` inline when a stable term is resolved.
-- Offer an ADR only when the decision is hard to reverse, surprising without context, and a real trade-off.
+- Update `{config.docs.context_file}` inline when a stable term is resolved. Use [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+- Treat `CONTEXT.md` as a glossary only: no implementation details, no plan, no PRD.
+- Offer an ADR only when the decision is hard to reverse, surprising without context, and a real trade-off. Use [ADR-FORMAT.md](./ADR-FORMAT.md).
 
-Ask one numbered question. Include your recommended answer.
+Ask one numbered question at a time. Include your recommended answer.
 
 ## Output
 

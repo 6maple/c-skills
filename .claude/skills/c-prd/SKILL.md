@@ -26,7 +26,6 @@ Synthesize what is already known. Do not interview the user; if essential inform
 ## Solution
 
 ## User Stories
-
 1. As a ..., I want ..., so that ...
 
 ## Implementation Decisions

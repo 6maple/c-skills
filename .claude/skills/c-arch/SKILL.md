@@ -10,15 +10,7 @@ Surface architectural friction and propose deepening opportunities. Do not direc
 
 ## Vocabulary
 
-Use these terms consistently:
-
-- Module — anything with an interface and implementation.
-- Interface — everything a caller must know to use the module.
-- Implementation — code inside the module.
-- Depth — leverage behind a small interface.
-- Seam — where behavior can be altered without editing in place.
-- Adapter — concrete thing satisfying an interface at a seam.
-- Locality — change, bugs, and knowledge concentrated in one place.
+Use the architecture language in [LANGUAGE.md](./LANGUAGE.md) exactly. Consistent terms are part of the skill; do not drift into near-synonyms.
 
 ## Process
 
