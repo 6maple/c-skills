@@ -1,101 +1,96 @@
 ---
 name: c-fix
-description: Disciplined bug diagnosis and fix loop. Use when the user reports a bug, failing test, runtime error, wrong behavior, crash, or performance regression.
+description: Disciplined diagnosis loop for hard bugs and performance regressions. Reproduce -> minimise -> hypothesise -> instrument -> fix -> regression-test. Use when user says diagnose/debug, reports a bug, says something is broken/throwing/failing, or describes a performance regression.
 disable-model-invocation: true
 ---
 
-# c-fix
+# Diagnose
 
-A bug is not understood until there is a feedback loop. Skip phases only when explicitly justified.
+A discipline for hard bugs. Skip phases only when explicitly justified.
 
-## Evidence precedence
-
-Use configured docs as intent and vocabulary. Current source code, tests, typecheck/build output, and git diff are stronger evidence than stale `{config.docs.root_dir}` text.
+Read `.claude/skills/c-shared/config.md` first, then use the configured domain glossary and ADR paths where relevant.
 
 ## Phase 1 — Build a feedback loop
 
-This is the skill. Spend disproportionate effort here.
+**This is the skill.** Everything else is mechanical.
 
-Try, roughly in order:
+If you have a fast, deterministic, agent-runnable pass/fail signal for the bug, you will find the cause. Spend disproportionate effort here.
 
-1. Failing test at the seam that reaches the bug.
-2. Curl / HTTP script against a dev server.
-3. CLI invocation with fixture input and expected output.
-4. Headless browser script that asserts DOM, console, or network.
-5. Captured trace replay.
+Ways to construct one — try them in roughly this order:
+
+1. Failing test at whatever seam reaches the bug.
+2. Curl / HTTP script against a running dev server.
+3. CLI invocation with a fixture input, diffing stdout against a known-good snapshot.
+4. Headless browser script that drives the UI and asserts on DOM/console/network.
+5. Replay a captured trace.
 6. Throwaway harness around the smallest relevant subsystem.
-7. Property/fuzz loop for intermittent wrong output.
-8. Bisection or differential loop.
-9. HITL checklist as last resort.
+7. Property / fuzz loop.
+8. Bisection harness.
+9. Differential loop.
+10. HITL bash script as last resort.
 
-If the bug is non-deterministic, raise reproduction rate before debugging: loop 100x, parallelise, inject stress, narrow timing windows.
+Treat the loop as a product. Make it faster, sharper, and more deterministic.
 
-If no trustworthy loop can be built, stop. State what was tried and ask for artifact, environment access, logs, HAR, trace, core dump, screen recording, or permission to add temporary instrumentation.
+For non-deterministic bugs, the goal is a higher reproduction rate. Loop the trigger 100x, parallelise, add stress, narrow timing windows, inject sleeps.
+
+When you genuinely cannot build a loop, stop and say so explicitly. List what you tried. Ask the user for environment access, a captured artifact, or permission to add temporary instrumentation. Do not proceed to hypothesise without a loop.
 
 ## Phase 2 — Reproduce
 
-Run the loop. Confirm it produces the failure the user described, not a nearby failure. Capture exact symptom.
+Run the loop. Watch the bug appear.
+
+Confirm:
+
+- [ ] The loop produces the failure mode the user described.
+- [ ] The failure is reproducible across multiple runs, or high enough rate for non-deterministic bugs.
+- [ ] You captured the exact symptom so later phases can verify the fix.
 
 ## Phase 3 — Hypothesise
 
-Write 3–5 ranked falsifiable hypotheses before testing. Format:
+Generate 3–5 ranked hypotheses before testing any of them. Each hypothesis must be falsifiable:
 
 ```text
 If <cause> is true, then <probe/change> will make <prediction> happen.
 ```
 
-Show the list to the user before testing when they are present. If AFK, proceed with your ranking.
+Show the ranked list to the user before testing. Don't block on it — proceed with your ranking if the user is AFK.
 
 ## Phase 4 — Instrument
 
-Test one hypothesis at a time. Change one variable at a time. Prefer debugger/REPL where available, then targeted logs.
+Each probe must map to a specific prediction from Phase 3. Change one variable at a time.
 
-Tag temporary logs with a unique prefix like `[DEBUG-a4f2]`. Never log everything and grep.
+Tool preference:
 
-For performance regressions: measure first, fix second.
+1. Debugger / REPL inspection.
+2. Targeted logs at boundaries that distinguish hypotheses.
+3. Never "log everything and grep".
 
-## Phase 5 — Fix + regression
+Tag every debug log with a unique prefix, e.g. `[DEBUG-a4f2]`.
 
-Fix at the smallest correct seam. Add a regression test before the fix only when there is a correct seam that exercises the real bug pattern. If no correct seam exists, document that as an architecture finding and recommend `c-arch` after the fix.
+For performance regressions: establish a baseline measurement, then bisect. Measure first, fix second.
+
+## Phase 5 — Fix + regression test
+
+Write the regression test before the fix only if there is a correct seam for it. A correct seam exercises the real bug pattern as it occurs at the call site.
+
+If no correct seam exists, that itself is the finding. Note it.
+
+If a correct seam exists:
+
+1. Turn the minimised repro into a failing test at that seam.
+2. Watch it fail.
+3. Apply the fix.
+4. Watch it pass.
+5. Re-run the original feedback loop.
 
 ## Phase 6 — Cleanup + post-mortem
 
-Before declaring done:
+Required before declaring done:
 
-- Original loop no longer reproduces.
-- Regression test passes, or absence of correct seam is documented.
-- All `[DEBUG-...]` instrumentation is removed.
-- Throwaway harnesses/prototypes are deleted or clearly marked.
-- Cause is stated for the next debugger.
+- [ ] Original repro no longer reproduces.
+- [ ] Regression test passes, or absence of seam is documented.
+- [ ] All `[DEBUG-...]` instrumentation removed.
+- [ ] Throwaway prototypes deleted or clearly marked.
+- [ ] The hypothesis that turned out correct is stated in the commit / PR message.
 
-## Issue status writeback
-
-If invoked with an issue file path, update that file before final output.
-
-- On success: set frontmatter `status: done`, update `updated: YYYY-MM-DD`, and refresh the `## Result` section with changed files, verification evidence, and short notes.
-- On stop/block: set `status: blocked`, update `updated: YYYY-MM-DD`, and refresh the `## Blocked` section with reason, tried steps, and exact next action.
-- Do not leave a completed or stopped issue as `todo`.
-- Do not write long logs into the issue. Keep details in final response or verification output.
-
-## Output
-
-```text
-c-fix(done|partial|blocked)
-
-loop:
-- ...
-hypotheses:
-1. ...
-cause:
-- ...
-fix:
-- ...
-ev:
-- ...
-issue:
-- none|updated <issue-path> to done|blocked
-risk:
-- none
-next:
-- none|/c-review <issue-path>
-```
+Then ask: what would have prevented this bug? Make the recommendation after the fix is in, not before.

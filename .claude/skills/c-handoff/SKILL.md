@@ -1,46 +1,35 @@
 ---
 name: c-handoff
-description: Compact current work into one handoff snapshot for a fresh agent. Use when the session is ending, context is too long, or another agent will continue the task.
-argument-hint: What will the next session focus on?
+description: Compact the current conversation into a handoff document for another agent to pick up.
+argument-hint: "What will the next session be used for?"
 disable-model-invocation: true
 ---
 
-# c-handoff
+Read `.claude/skills/c-shared/config.md` first.
 
-Write one compact continuation snapshot. Reference existing artifacts instead of duplicating them. Handoff is a short-lived continuation hint, not a source of truth.
+Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save to `{config.docs.handoff_file}` and overwrite the previous handoff.
 
-## Process
+Do not duplicate content already captured in other artifacts: PRDs, plans, ADRs, issues, commits, or diffs. Reference them by path or URL instead.
 
-1. Read `.claude/skills/c-shared/config.md`.
-2. Summarize only current state needed by the next agent.
-3. Overwrite `{config.docs.handoff_file}`.
-4. Include the current issue path when one exists.
-5. Include the issue status if an issue is active.
-6. Include suggested skill for the next session.
-7. Redact secrets, tokens, passwords, personal data, and environment-specific credentials.
+Include a "suggested skills" section in the document, which suggests skills the next agent should invoke.
 
-## Include
+Include a "Doc Hygiene" section so cleanup is hard to forget:
 
-- Current issue or goal.
-- Current state.
-- Confirmed decisions.
-- Changed files.
-- Verification status.
-- Open questions.
-- Risks.
-- Next recommended skill.
+```markdown
+## Doc Hygiene
 
-## Output
+active:
+- <doc path> — <why still needed>
 
-```text
-c-handoff(saved|blocked)
+stale:
+- <doc path> — <why likely stale>
 
-doc:
-- {config.docs.handoff_file}
-state:
-- ...
-next:
-- /c-takeover
-risk:
-- none
+cleanup_next:
+- <delete|merge|review> <doc path> after <condition>
 ```
+
+Use `none` when there is nothing to record. Do not delete docs during handoff.
+
+Redact any sensitive information, such as API keys, passwords, or personally identifiable information.
+
+If the user passed arguments, treat them as a description of what the next session will focus on and tailor the doc accordingly.

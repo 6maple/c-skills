@@ -1,46 +1,55 @@
 ---
 name: c-grill
-description: Challenge a plan or unclear task against the project's domain language and decisions. Use when requirements are ambiguous, a design needs stress-testing, or a blocking decision must be resolved before implementation.
+description: Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates documentation inline as decisions crystallise. Use when the user wants to stress-test a plan against their project's language and documented decisions.
 disable-model-invocation: true
 ---
 
 # c-grill
 
-Interview one decision at a time until the blocker is gone. If code or docs can answer the question, inspect them instead of asking.
+Interview me relentlessly about every aspect of this plan until we reach a shared understanding.
+
+Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer. Ask the questions one at a time, waiting for feedback on each question before continuing. If a question can be answered by exploring the codebase, explore the codebase instead.
 
 ## Domain awareness
 
-Read `.claude/skills/c-shared/config.md`, then look for:
+Read `.claude/skills/c-shared/config.md` first, then use:
 
-- `{config.docs.context_file}` — stable domain vocabulary.
-- `{config.docs.adr_dir}` — hard-to-reverse decisions.
-- `CONTEXT-MAP.md` if the repo uses multiple bounded contexts.
+- `{config.docs.context_file}` as the domain glossary.
+- `{config.docs.adr_dir}` for ADRs.
+- `CONTEXT-MAP.md` if the repo uses multiple contexts.
 
-Create docs lazily. Write only when a term or decision actually crystallises.
+Create files lazily — only when you have something to write.
 
 ## During the session
 
-- Challenge glossary conflicts immediately.
-- Sharpen vague language into one canonical term.
-- Use concrete scenarios to expose boundary problems.
-- Cross-check user claims with code when cheap.
-- Update `{config.docs.context_file}` inline when a stable term is resolved. Use [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
-- Treat `{config.docs.context_file}` as a glossary only: no implementation details, no plan, no PRD.
-- Offer an ADR only when the decision is hard to reverse, surprising without context, and a real trade-off. Use [ADR-FORMAT.md](./ADR-FORMAT.md).
+### Challenge against the glossary
 
-Ask one numbered question at a time. Include your recommended answer.
+When the user uses a term that conflicts with the existing language in `{config.docs.context_file}`, call it out immediately.
 
-## Output
+### Sharpen fuzzy language
 
-```text
-c-grill(blocked|clear[,doc])
+When the user uses vague or overloaded terms, propose a precise canonical term.
 
-q:
-1. ...
-recommend:
-- ...
-doc:
-- none
-next:
-- wait user
-```
+### Discuss concrete scenarios
+
+When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
+
+### Cross-reference with code
+
+When the user states how something works, check whether the code agrees. If you find a contradiction, surface it.
+
+### Update context inline
+
+When a term is resolved, update `{config.docs.context_file}` right there. Don't batch these up. Use [CONTEXT-FORMAT.md](./CONTEXT-FORMAT.md).
+
+`{config.docs.context_file}` should be totally devoid of implementation details. Do not treat it as a spec, scratch pad, or repository for implementation decisions. It is a glossary and nothing else.
+
+### Offer ADRs sparingly
+
+Only offer to create an ADR when all three are true:
+
+1. **Hard to reverse** — the cost of changing your mind later is meaningful.
+2. **Surprising without context** — a future reader will wonder why.
+3. **The result of a real trade-off** — there were genuine alternatives and one was picked for specific reasons.
+
+If any of the three is missing, skip the ADR. Use [ADR-FORMAT.md](./ADR-FORMAT.md).

@@ -1,38 +1,9 @@
 ---
 name: c-zoom-out
-description: Explain a code area one abstraction level up. Use when the user is unfamiliar with a section of code, asks how this fits into the bigger picture, or needs a module/caller map before changing code.
+description: Tell the agent to zoom out and give broader context or a higher-level perspective. Use when you're unfamiliar with a section of code or need to understand how it fits into the bigger picture.
 disable-model-invocation: true
 ---
 
-# c-zoom-out
+Read `.claude/skills/c-shared/config.md` first.
 
-Go up one layer of abstraction. Do not implement.
-
-## Evidence precedence
-
-Treat configured docs as context, not proof. Prefer current code and verified behavior when they conflict with old `{config.docs.root_dir}` content.
-
-## Process
-
-1. Read `.claude/skills/c-shared/config.md`.
-2. Use the project domain glossary when available.
-3. Inspect only the relevant files, callers, callees, routes, commands, tests, and ADRs needed to explain the area.
-4. Produce a concise map of the relevant modules and how they relate.
-5. Name the likely next skill if the user wants to act.
-
-## Output
-
-```text
-c-zoom-out(done|blocked)
-
-map:
-1. <module> -> <role / callers / callees>
-flow:
-- ...
-vocabulary:
-- ...
-risk:
-- none
-next:
-- /c-skill ...
-```
+I don't know this area of code well. Go up a layer of abstraction. Give me a map of all the relevant modules and callers, using the project's configured domain glossary vocabulary.

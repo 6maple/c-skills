@@ -1,68 +1,37 @@
 ---
 name: c-prototype
-description: Build a throwaway prototype to answer a design question before committing to production code. Use for state model sanity checks, data model exploration, UI variants, interaction design, or when the user says prototype, mock up, try a few designs, or let me play with it.
+description: Build a throwaway prototype to flesh out a design before committing to it. Routes between two branches — a runnable terminal app for state/business-logic questions, or several radically different UI variations toggleable from one route. Use when the user wants to prototype, sanity-check a data model or state machine, mock up a UI, explore design options, or says prototype this, let me play with it, or try a few designs.
 disable-model-invocation: true
 ---
 
-# c-prototype
+# Prototype
 
-A prototype is throwaway code that answers a question. The question decides the shape.
+A prototype is **throwaway code that answers a question**. The question decides the shape.
 
-## Evidence precedence
-
-Use configured docs as intent and vocabulary. Current source code and runnable prototype evidence beat stale `{config.docs.root_dir}` text.
+Read `.claude/skills/c-shared/config.md` first, then use the configured domain glossary and ADR paths when relevant.
 
 ## Pick a branch
 
-Identify the question being answered:
+Identify which question is being answered — from the user's prompt, the surrounding code, or by asking if the user is around:
 
-- Logic/state/data model question -> use [LOGIC.md](./LOGIC.md).
-- UI/visual/layout/interaction question -> use [UI.md](./UI.md).
+- **"Does this logic / state model feel right?"** -> [LOGIC.md](LOGIC.md). Build a tiny interactive terminal app that pushes the state machine through cases that are hard to reason about on paper.
+- **"What should this look like?"** -> [UI.md](UI.md). Generate several radically different UI variations on a single route, switchable via a URL search param and a floating bottom bar.
 
-If ambiguous and the user is unavailable, choose the branch that best matches the surrounding code and state the assumption at the top of the prototype.
+The two branches produce very different artifacts — getting this wrong wastes the whole prototype.
+
+If the question is genuinely ambiguous and the user isn't reachable, default to whichever branch better matches the surrounding code and state the assumption at the top of the prototype.
 
 ## Rules that apply to both
 
-1. Clearly mark prototype code as throwaway.
-2. Locate it near the code it is prototyping for, but name it so it cannot be mistaken for production.
-3. Provide one command or URL to run it.
-4. Use in-memory state by default. Persistence only when persistence is the question.
-5. Skip polish: no tests, no broad error handling, no abstractions beyond what makes it runnable.
-6. Surface state after every action or variant switch.
-7. Delete or absorb when done. Do not leave stale prototype code in the repo.
+1. **Throwaway from day one, and clearly marked as such.** Locate the prototype code close to where it will actually be used, but name it so a casual reader can see it's a prototype, not production.
+2. **One command to run.** Whatever the project's existing task runner supports. The user must be able to start it without thinking.
+3. **No persistence by default.** State lives in memory. Persistence is the thing the prototype is checking, not something it should depend on.
+4. **Skip the polish.** No tests, no error handling beyond what makes the prototype runnable, no abstractions.
+5. **Surface the state.** After every action or variant switch, print or render the full relevant state.
+6. **Delete or absorb when done.** When the prototype has answered its question, either delete it or fold the validated decision into the real code.
 
-## Capture the answer
+## When done
 
-The answer is the only durable artifact. Capture it in a commit message, ADR, issue, or `NOTES.md` next to the prototype. If the user is present, ask what decision the prototype produced.
+The answer is the only thing worth keeping from a prototype.
 
-## Issue status writeback
-
-If invoked with an issue file path, update that file before final output.
-
-- On success: set frontmatter `status: done`, update `updated: YYYY-MM-DD`, and refresh the `## Result` section with changed files, verification evidence, and short notes.
-- On stop/block: set `status: blocked`, update `updated: YYYY-MM-DD`, and refresh the `## Blocked` section with reason, tried steps, and exact next action.
-- Do not leave a completed or stopped issue as `todo`.
-- Do not write long logs into the issue. Keep details in final response or verification output.
-
-## Output
-
-```text
-c-prototype(done|partial|blocked)
-
-question:
-- ...
-branch:
-- logic|ui
-run:
-- ...
-artifact:
-- ...
-answer:
-- pending|...
-issue:
-- none|updated <issue-path> to done|blocked
-risk:
-- prototype code must be deleted or absorbed
-next:
-- wait user | /c-implement ... | /c-refactor ...
-```
+Capture it somewhere durable — commit message, ADR, issue, or `NOTES.md` next to the prototype — along with the question it was answering. If the user is around, that capture is a quick conversation; if not, leave the placeholder so they or you on the next pass can fill in the verdict before deleting the prototype.

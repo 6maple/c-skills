@@ -1,37 +1,44 @@
-# HANDOFF
+# Handoff
 
-Trust: continuation hint only; verify against repo evidence.
+## Current goal
 
-Current issue: none
+none
 
-## State
+## Current state
 
-- none
-
-## Done
-
-- none
-
-## Changed Files
-
-- none
+none
 
 ## Decisions
 
-- none
+none
 
-## Open Questions
+## Changed files
 
-- none
+none
 
 ## Verification
 
+none
+
+## Open questions
+
+none
+
+## Risks
+
+none
+
+## Doc Hygiene
+
+active:
 - none
 
-## Risk
-
+stale:
 - none
 
-## Next
+cleanup_next:
+- none
+
+## Suggested skills
 
 - none

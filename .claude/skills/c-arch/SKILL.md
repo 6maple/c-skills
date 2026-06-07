@@ -1,92 +1,71 @@
 ---
 name: c-arch
-description: Find codebase deepening opportunities using project domain language and ADRs. Use for architecture friction, shallow modules, missing seams, excessive coupling, or architecture review.
+description: Find deepening opportunities in a codebase, informed by the domain language and ADRs. Use when the user wants to improve architecture, find refactoring opportunities, consolidate tightly-coupled modules, or make a codebase more testable and AI-navigable.
 disable-model-invocation: true
 ---
 
-# c-arch
+# Improve Codebase Architecture
 
-Surface architectural friction and propose **deepening opportunities**. Do not directly refactor. Do not propose interfaces before the user chooses a candidate.
+Surface architectural friction and propose **deepening opportunities** — refactors that turn shallow modules into deep ones.
 
-## Vocabulary
+The aim is testability and AI-navigability.
 
-Use [LANGUAGE.md](./LANGUAGE.md) exactly. Architecture vocabulary consistency is part of the skill.
+## Glossary
 
-Use project domain terms from `{config.docs.context_file}`. Respect ADRs under `{config.docs.adr_dir}`.
+Use these terms exactly in every suggestion. Consistent language is the point. Full definitions in [LANGUAGE.md](LANGUAGE.md).
 
-## Evidence precedence
+- **Module** — anything with an interface and an implementation.
+- **Interface** — everything a caller must know to use the module.
+- **Implementation** — the code inside.
+- **Depth** — leverage at the interface: a lot of behaviour behind a small interface.
+- **Seam** — where an interface lives; a place behaviour can be altered without editing in place.
+- **Adapter** — a concrete thing satisfying an interface at a seam.
+- **Leverage** — what callers get from depth.
+- **Locality** — what maintainers get from depth: change, bugs, knowledge concentrated in one place.
 
-Treat configured docs as context, not proof. Prefer current code and verified behavior when they conflict with old `{config.docs.root_dir}` content.
+Key principles:
+
+- **Deletion test**: imagine deleting the module. If complexity vanishes, it was a pass-through. If complexity reappears across N callers, it was earning its keep.
+- **The interface is the test surface.**
+- **One adapter = hypothetical seam. Two adapters = real seam.**
+
+This skill is informed by the project's domain model. Read `.claude/skills/c-shared/config.md` first, then use the configured domain glossary and ADR paths.
 
 ## Process
 
 ### 1. Explore
 
-Read the project glossary and relevant ADRs first. Then explore the codebase organically. Note where you experience friction:
+Read the project's domain glossary and any ADRs in the area you're touching first. Then explore the codebase organically and note where you experience friction:
 
-- Understanding one concept requires bouncing across many modules.
-- A module is shallow: interface nearly matches implementation.
-- Pure functions exist only for testability, but bugs hide in orchestration.
-- Tight coupling leaks across seams.
-- Important behavior is hard to test through the current interface.
+- Where does understanding one concept require bouncing between many small modules?
+- Where are modules shallow?
+- Where have pure functions been extracted just for testability, but the real bugs hide in how they're called?
+- Where do tightly-coupled modules leak across their seams?
+- Which parts of the codebase are untested, or hard to test through their current interface?
 
-Apply the deletion test: if deleting the module makes complexity vanish, it is shallow; if complexity reappears across N callers, it is earning its keep.
+Apply the deletion test to anything you suspect is shallow.
 
 ### 2. Present candidates as an HTML report
 
-Write a self-contained HTML report to the OS temp directory, not the repo:
+Write a self-contained HTML file to the OS temp directory so nothing lands in the repo. Open it for the user when possible and tell them the absolute path.
 
-```text
-$TMPDIR/architecture-review-<timestamp>.html
-/tmp/architecture-review-<timestamp>.html
-%TEMP%\architecture-review-<timestamp>.html
-```
-
-Use [HTML-REPORT.md](./HTML-REPORT.md). Each candidate card must include:
+The report uses [HTML-REPORT.md](HTML-REPORT.md). Each candidate card includes:
 
 - Files/modules involved.
 - Problem.
 - Solution.
-- Benefits in terms of leverage and locality.
-- Before/after visualisation.
+- Benefits in terms of locality and leverage.
+- Before / after visualisation.
 - Recommendation strength: `Strong`, `Worth exploring`, or `Speculative`.
 
-End with one top recommendation.
-
-After writing the report, open it for the user when possible and provide the absolute path. Then ask: `Which of these would you like to explore?`
+End with a top recommendation. Do NOT propose interfaces yet. After the file is written, ask: "Which of these would you like to explore?"
 
 ### 3. Grilling loop
 
-When the user picks a candidate, walk the design tree with them:
+Once the user picks a candidate, walk the design tree with them — constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
 
-- constraints
-- dependencies
-- seam placement
-- what sits behind the seam
-- what tests survive
-- adapter strategy
+Side effects happen inline as decisions crystallize:
 
-If the user wants alternative interfaces, use [INTERFACE-DESIGN.md](./INTERFACE-DESIGN.md).
-
-### 4. Side effects
-
-- If a deepened module needs a stable domain term, update `{config.docs.context_file}` using `../c-grill/CONTEXT-FORMAT.md`.
-- If the user rejects a candidate with a load-bearing reason future reviews would need, offer an ADR using `../c-grill/ADR-FORMAT.md`.
-- If the chosen candidate is ready to execute, route to `c-issues` or `c-refactor`.
-
-## Output
-
-```text
-c-arch(report|blocked)
-
-report:
-- <absolute temp html path>
-candidates:
-1. <candidate> — Strong|Worth exploring|Speculative
-recommend:
-- <top recommendation>
-doc:
-- none
-next:
-- wait user
-```
+- Naming a deepened module after a concept not in `{config.docs.context_file}`? Add the term using `../c-grill/CONTEXT-FORMAT.md`.
+- User rejects the candidate with a load-bearing reason? Offer an ADR using `../c-grill/ADR-FORMAT.md`.
+- Want to explore alternative interfaces? See [INTERFACE-DESIGN.md](INTERFACE-DESIGN.md).

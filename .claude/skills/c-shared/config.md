@@ -7,7 +7,4 @@
     <issues_dir>.docs/issues</issues_dir>
     <handoff_file>.docs/HANDOFF.md</handoff_file>
   </docs>
-  <runtime>
-    <data_dir>.cache/c-skills-data</data_dir>
-  </runtime>
 </config>

@@ -1,102 +1,100 @@
 ---
 name: c-tdd
-description: Test-driven development with a red-green-refactor loop. Use for stable, testable, high-risk behavior, core logic, API contracts, regressions, or when the user asks for TDD/test-first development.
+description: Test-driven development with red-green-refactor loop. Use when user wants to build features or fix bugs using TDD, mentions red-green-refactor, wants integration tests, or asks for test-first development.
 disable-model-invocation: true
 ---
 
-# c-tdd
+# Test-Driven Development
 
-Tests verify behavior through public interfaces, not implementation details.
+## Philosophy
 
-Good tests exercise real code paths and read like specifications. Bad tests mock internals, test private methods, or break when behavior is unchanged.
+**Core principle**: Tests should verify behavior through public interfaces, not implementation details. Code can change entirely; tests shouldn't.
 
-See [tests.md](tests.md) and [mocking.md](mocking.md) if this repo provides them.
+**Good tests** are integration-style: they exercise real code paths through public APIs. They describe what the system does, not how it does it. A good test reads like a specification.
 
-## Anti-pattern: horizontal RED/GREEN
+**Bad tests** are coupled to implementation. They mock internal collaborators, test private methods, or verify through external means instead of using the public interface. The warning sign: your test breaks when you refactor, but behavior hasn't changed.
 
-Do not write all tests first, then all implementation.
+See [tests.md](tests.md) for examples and [mocking.md](mocking.md) for mocking guidelines when the repo provides them.
+
+## Anti-Pattern: Horizontal Slices
+
+**DO NOT write all tests first, then all implementation.** This is horizontal slicing.
+
+Correct approach: vertical slices via tracer bullets.
 
 ```text
 WRONG:
-RED: test1, test2, test3
-GREEN: impl1, impl2, impl3
+RED: test1, test2, test3, test4, test5
+GREEN: impl1, impl2, impl3, impl4, impl5
 
 RIGHT:
-RED -> GREEN: behavior 1
-RED -> GREEN: behavior 2
-RED -> GREEN: behavior 3
+RED -> GREEN: test1 -> impl1
+RED -> GREEN: test2 -> impl2
+RED -> GREEN: test3 -> impl3
 ```
-
-## Evidence precedence
-
-Use configured docs as intent and vocabulary. Current source code, tests, typecheck/build output, and git diff are stronger evidence than stale `{config.docs.root_dir}` text.
 
 ## Workflow
 
 ### 1. Planning
 
-- Read the project glossary and relevant ADRs.
-- Confirm public interface changes.
-- Confirm behavior priority.
-- Identify opportunities for deep modules.
-- Design interfaces for testability.
-- List behaviors, not implementation steps.
+Read `.claude/skills/c-shared/config.md` first, then use the configured domain glossary and ADR paths.
 
-Ask when unclear: `What should the public interface look like? Which behaviors matter most?`
+Before writing any code:
 
-### 2. Tracer bullet
+- [ ] Confirm with user what interface changes are needed.
+- [ ] Confirm with user which behaviors to test.
+- [ ] Identify opportunities for deep modules.
+- [ ] Design interfaces for testability.
+- [ ] List the behaviors to test, not implementation steps.
+- [ ] Get user approval on the plan.
 
-Write one test for one observable behavior. Run it. Ensure it fails for the expected reason. Implement only enough code to pass.
+Ask: "What should the public interface look like? Which behaviors are most important to test?"
 
-### 3. Incremental loop
+You can't test everything. Confirm with the user exactly which behaviors matter most. Focus testing effort on critical paths and complex logic, not every possible edge case.
+
+### 2. Tracer Bullet
+
+Write ONE test that confirms ONE thing about the system:
+
+```text
+RED: Write test for first behavior -> test fails
+GREEN: Write minimal code to pass -> test passes
+```
+
+### 3. Incremental Loop
 
 For each remaining behavior:
 
 ```text
-RED: one failing behavior test
-GREEN: minimal code to pass
+RED: Write next test -> fails
+GREEN: Minimal code to pass -> passes
 ```
 
-Do not anticipate future tests.
+Rules:
+
+- One test at a time.
+- Only enough code to pass the current test.
+- Don't anticipate future tests.
+- Keep tests focused on observable behavior.
 
 ### 4. Refactor
 
-Refactor only while GREEN. Deepen modules where useful. Run tests after each refactor step.
+After all tests pass, look for refactor candidates:
 
-## Checklist per cycle
+- [ ] Extract duplication.
+- [ ] Deepen modules.
+- [ ] Apply SOLID principles where natural.
+- [ ] Consider what new code reveals about existing code.
+- [ ] Run tests after each refactor step.
 
-- [ ] Test describes behavior, not implementation.
-- [ ] Test uses a public seam.
-- [ ] Test would survive internal refactor.
-- [ ] Code is minimal for this test.
-- [ ] No speculative feature was added.
+**Never refactor while RED.** Get to GREEN first.
 
-## Issue status writeback
-
-If invoked with an issue file path, update that file before final output.
-
-- On success: set frontmatter `status: done`, update `updated: YYYY-MM-DD`, and refresh the `## Result` section with changed files, verification evidence, and short notes.
-- On stop/block: set `status: blocked`, update `updated: YYYY-MM-DD`, and refresh the `## Blocked` section with reason, tried steps, and exact next action.
-- Do not leave a completed or stopped issue as `todo`.
-- Do not write long logs into the issue. Keep details in final response or verification output.
-
-## Output
+## Checklist Per Cycle
 
 ```text
-c-tdd(done|partial|blocked)
-
-red:
-- ...
-green:
-- ...
-refactor:
-- none
-ev:
-- ...
-issue:
-- none|updated <issue-path> to done|blocked
-risk:
-- none
-next:
-- none|/c-review <issue-path>
+[ ] Test describes behavior, not implementation
+[ ] Test uses public interface only
+[ ] Test would survive internal refactor
+[ ] Code is minimal for this test
+[ ] No speculative features added
 ```
