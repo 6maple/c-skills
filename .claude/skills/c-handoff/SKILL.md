@@ -2,33 +2,46 @@
 name: c-handoff
 description: Compact the current conversation into a handoff document for another agent to pick up.
 argument-hint: "What will the next session be used for?"
-disable-model-invocation: true
 ---
 
-Read `.claude/skills/c-shared/config.md` first.
-
-Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save to `{config.docs.handoff_file}` and overwrite the previous handoff.
-
-Do not duplicate content already captured in other artifacts: PRDs, plans, ADRs, issues, commits, or diffs. Reference them by path or URL instead.
-
-Include a "suggested skills" section in the document, which suggests skills the next agent should invoke.
-
-Include a "Doc Hygiene" section so cleanup is hard to forget:
-
-```markdown
-## Doc Hygiene
-
-active:
-- <doc path> — <why still needed>
-
-stale:
-- <doc path> — <why likely stale>
-
-cleanup_next:
-- <delete|merge|review> <doc path> after <condition>
+<important>
+Strictly follow this path mapping:
+```json
+{
+  "path_mappings": {
+    "CONTEXT.md": ".docs/CONTEXT.md",
+    "CONTEXT-MAP.md": ".docs/CONTEXT-MAP.md",
+    "docs/adr/": ".docs/adr",
+    "per_context_CONTEXT.md": "<context>/.docs/CONTEXT.md",
+    "per_context_docs/adr/": "<context>/.docs/adr"
+  },
+  "outputs": {
+    "prd": ".docs/prd",
+    "issue": ".docs/issues",
+    "handoff": ".docs/HANDOFF.md",
+    "temporary": ".docs/.tmp",
+    "architecture_report": ".docs/.tmp/architecture-review-<timestamp>.html"
+  },
+  "configs": {
+    "issue_tracker": ".docs/agents/issue-tracker.md"
+  },
+  "search_dirs": {
+    "spec": [
+      ".docs/prd",
+      ".docs/issues",
+      ".docs/specs",
+      ".docs/.scratch"
+    ]
+  }
+}
 ```
+</important>
 
-Use `none` when there is nothing to record. Do not delete docs during handoff.
+Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save to the temporary directory of the user's OS - not the current workspace.
+
+Include a "suggested skills" section in the document, which suggests skills that the agent should invoke.
+
+Do not duplicate content already captured in other artifacts (PRDs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead.
 
 Redact any sensitive information, such as API keys, passwords, or personally identifiable information.
 
