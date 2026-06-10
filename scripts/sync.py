@@ -38,7 +38,11 @@ class SkillMapping:
 
 
 MAPPED_SKILLS: tuple[SkillMapping, ...] = (
-    SkillMapping("c-arch", "skills/engineering/improve-codebase-architecture", "improve-codebase-architecture"),
+    SkillMapping(
+        "c-arch",
+        "skills/engineering/improve-codebase-architecture",
+        "improve-codebase-architecture",
+    ),
     SkillMapping("c-fix", "skills/engineering/diagnose", "diagnose"),
     SkillMapping("c-grill", "skills/engineering/grill-with-docs", "grill-with-docs"),
     SkillMapping("c-handoff", "skills/productivity/handoff", "handoff"),
@@ -88,7 +92,9 @@ def print_error(message: str) -> None:
 
 def load_sync_instruction(root: Path) -> str:
     config_text = read_text(root / CONFIG_PATH)
-    match = re.search(r"\A\s*(<important>.*?</important>)\s*\Z", config_text, flags=re.DOTALL)
+    match = re.search(
+        r"\A\s*(<important>.*?</important>)\s*\Z", config_text, flags=re.DOTALL
+    )
     if match is None:
         raise RuntimeError(f"Expected a single <important> block in {CONFIG_PATH}")
 
@@ -111,11 +117,15 @@ def ensure_upstream(cache_dir: Path, ref: str, fetch: bool) -> str:
         git_dir.rename(hidden_git_dir)
     elif git_dir.is_dir():
         if hidden_git_dir.exists():
-            raise RuntimeError(f"Both {GIT_DIR_NAME} and {HIDDEN_GIT_DIR_NAME} exist in cache: {cache_dir}")
+            raise RuntimeError(
+                f"Both {GIT_DIR_NAME} and {HIDDEN_GIT_DIR_NAME} exist in cache: {cache_dir}"
+            )
         git_dir.rename(hidden_git_dir)
 
     if not hidden_git_dir.is_dir():
-        raise RuntimeError(f"Cache path exists but is not a git repository: {cache_dir}")
+        raise RuntimeError(
+            f"Cache path exists but is not a git repository: {cache_dir}"
+        )
 
     git_args = ["git", "--git-dir", HIDDEN_GIT_DIR_NAME, "--work-tree", "."]
     if fetch:
@@ -132,7 +142,9 @@ def copy_mapped_skill(root: Path, upstream_root: Path, mapping: SkillMapping) ->
     if not source.is_dir():
         raise RuntimeError(f"Mapped upstream skill does not exist: {source}")
     if not destination.parent.is_dir():
-        raise RuntimeError(f"Local skills directory does not exist: {destination.parent}")
+        raise RuntimeError(
+            f"Local skills directory does not exist: {destination.parent}"
+        )
 
     if destination.exists():
         shutil.rmtree(destination)
@@ -166,11 +178,19 @@ def replace_required(text: str, old: str, new: str, path: Path) -> str:
 def adapt_frontmatter(root: Path, mapping: SkillMapping) -> None:
     path = root / ".claude" / "skills" / mapping.local / "SKILL.md"
     text = read_text(path)
-    text = replace_required(text, f"name: {mapping.upstream_name}", f"name: {mapping.local}", path)
+    text = replace_required(
+        text, f"name: {mapping.upstream_name}", f"name: {mapping.local}", path
+    )
+    if "disable-model-invocation: true" not in text:
+        text = replace_required(
+            text, "\n---\n", "\ndisable-model-invocation: true\n---\n", path
+        )
     write_text(path, text)
 
 
-def insert_instruction_after_frontmatter(root: Path, mapping: SkillMapping, instruction: str) -> None:
+def insert_instruction_after_frontmatter(
+    root: Path, mapping: SkillMapping, instruction: str
+) -> None:
     path = root / ".claude" / "skills" / mapping.local / "SKILL.md"
     text = read_text(path)
     if instruction in text:
@@ -180,7 +200,9 @@ def insert_instruction_after_frontmatter(root: Path, mapping: SkillMapping, inst
     if match is None:
         raise RuntimeError(f"Expected YAML frontmatter in {path}")
 
-    rewritten = match.group(1) + "\n" + instruction.strip() + "\n\n" + match.group(2).lstrip()
+    rewritten = (
+        match.group(1) + "\n" + instruction.strip() + "\n\n" + match.group(2).lstrip()
+    )
     write_text(path, rewritten)
 
 
@@ -216,7 +238,11 @@ def list_local_only_skills(root: Path) -> list[str]:
     skills_dir = root / ".claude" / "skills"
     local_only = []
     for child in sorted(skills_dir.iterdir()):
-        if child.is_dir() and child.name not in mapped and child.name not in shared_non_skill:
+        if (
+            child.is_dir()
+            and child.name not in mapped
+            and child.name not in shared_non_skill
+        ):
             local_only.append(child.name)
     return local_only
 
@@ -233,12 +259,20 @@ def print_reminders(root: Path, upstream_commit: str) -> None:
     if not local_only:
         print_warning("- No local-only skills found.")
     print()
-    print_warning("Also review README.md, README.zh-CN.md, and release zip packaging if this is a release.")
+    print_warning(
+        "Also review README.md, README.zh-CN.md, and release zip packaging if this is a release."
+    )
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Sync only mapped c-* skills from mattpocock/skills.")
-    parser.add_argument("--ref", default=UPSTREAM_REF, help=f"Git ref to sync from. Default: {UPSTREAM_REF}")
+    parser = argparse.ArgumentParser(
+        description="Sync only mapped c-* skills from mattpocock/skills."
+    )
+    parser.add_argument(
+        "--ref",
+        default=UPSTREAM_REF,
+        help=f"Git ref to sync from. Default: {UPSTREAM_REF}",
+    )
     parser.add_argument(
         "--cache-dir",
         type=Path,
@@ -261,7 +295,9 @@ def main() -> int:
     try:
         instruction = load_sync_instruction(root)
         upstream_commit = ensure_upstream(cache_dir, args.ref, fetch=not args.no_fetch)
-        with tempfile.TemporaryDirectory(prefix="c-skills-sync-backup-") as backup_dir_name:
+        with tempfile.TemporaryDirectory(
+            prefix="c-skills-sync-backup-"
+        ) as backup_dir_name:
             backup_root = Path(backup_dir_name)
             backup_mapped_skills(root, backup_root)
             try:
@@ -273,7 +309,9 @@ def main() -> int:
 
                 missing = validate_plugin_paths(root)
                 if missing:
-                    raise RuntimeError("Missing plugin skill paths: " + ", ".join(missing))
+                    raise RuntimeError(
+                        "Missing plugin skill paths: " + ", ".join(missing)
+                    )
 
             except Exception:
                 restore_mapped_skills(root, backup_root)
