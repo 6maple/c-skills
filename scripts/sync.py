@@ -181,6 +181,26 @@ def adapt_frontmatter(root: Path, mapping: SkillMapping) -> None:
     text = replace_required(
         text, f"name: {mapping.upstream_name}", f"name: {mapping.local}", path
     )
+    description_match = re.search(r"^description:\s*(.+)$", text, flags=re.MULTILINE)
+    if description_match is None:
+        raise RuntimeError(f"Expected description in {path}")
+
+    description_value = description_match.group(1)
+    description_info_match = re.search(
+        r"^description-info:\s*(.+)$", text, flags=re.MULTILINE
+    )
+    if description_info_match is None:
+        text = replace_required(
+            text,
+            f"description: {description_value}",
+            "description: ban\n"
+            f"description-info: {description_value}",
+            path,
+        )
+    else:
+        text = replace_required(
+            text, f"description: {description_value}", "description: ban", path
+        )
     if "disable-model-invocation: true" not in text:
         text = replace_required(
             text, "\n---\n", "\ndisable-model-invocation: true\n---\n", path

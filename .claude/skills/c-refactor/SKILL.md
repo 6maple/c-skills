@@ -1,6 +1,7 @@
 ---
 name: c-refactor
-description: Refactor existing code without changing observable behavior. Use when the user explicitly asks to refactor, rename, move, simplify, clean up, or mechanically improve existing code structure.
+description: ban
+description-info: Refactor existing code without changing observable behavior. Use when the user explicitly asks to refactor, rename, move, simplify, clean up, or mechanically improve existing code structure.
 disable-model-invocation: true
 ---
 

@@ -1,6 +1,7 @@
 ---
 name: c-takeover
-description: Establish a trusted project starting point before coding. Use for first-touch repos, resumed work, stale handoff snapshots, unknown project state, or when another c-* skill lacks project context.
+description: ban
+description-info: Establish a trusted project starting point before coding. Use for first-touch repos, resumed work, stale handoff snapshots, unknown project state, or when another c-* skill lacks project context.
 disable-model-invocation: true
 ---
 
