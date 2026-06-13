@@ -32,6 +32,7 @@ def run(args: list[str], cwd: Path | None = None) -> str:
         cwd=cwd,
         check=True,
         text=True,
+        encoding="utf-8",
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
