@@ -18,8 +18,10 @@ Typical entrypoints:
 
 - Start with `c-takeover` when the project state is unknown or stale.
 - Use `c-grill`, `c-prd`, and `c-issues` to shape work before implementation.
-- Use `c-tdd`, `c-fix`, `c-refactor`, `c-arch`, and `c-review` for engineering
-  execution and review.
+- Use `c-design-implement-guide` to design implementation approach per issue.
+- Use `c-tdd`, `c-fix`, `c-refactor`, and `c-arch` for engineering execution.
+- Use `c-qa-ui` and `c-fix-ui` for UI visual fidelity review and fixes.
+- Use `c-review` before merging.
 - Use `c-handoff` before compacting or passing work to another agent.
 
 ## Skills
@@ -29,9 +31,12 @@ Typical entrypoints:
 - `c-prd`: synthesize current context into a PRD.
 - `c-issues`: break a plan, spec, or PRD into tracer-bullet vertical issues.
 - `c-prototype`: build throwaway logic/UI prototypes to answer design questions.
+- `c-design-implement-guide`: produce implementation design guide per issue before coding.
 - `c-zoom-out`: explain a code area one abstraction level up.
 - `c-tdd`: red-green-refactor for stable, testable behavior.
 - `c-fix`: feedback-loop-first bug diagnosis and fix.
+- `c-fix-ui`: fix frontend UI issues from QA review feedback.
+- `c-qa-ui`: compare design image vs screenshot, report visual fidelity gaps.
 - `c-arch`: deep-module architecture review.
 - `c-review`: two-axis review: Standards and Spec.
 - `c-handoff`: compact continuation state.
@@ -94,6 +99,7 @@ with an error and tells you to move or delete that directory manually.
 - `scripts/install.py`: install this package into another project.
 - `scripts/sync.py`: sync mapped skills from upstream.
 - `UPSTREAM-SYNC.md`: review checklist and mapping for upstream updates.
+- `c-skills-slim-v5.zip`: release archive.
 
 ## Config
 
@@ -108,6 +114,7 @@ Current mappings include:
 - handoff output -> `.docs/HANDOFF.md`
 - temporary output -> `.docs/.tmp`
 - architecture reports -> `.docs/.tmp/architecture-review-<timestamp>.html`
+- design implement guide -> `.docs/design-implement-guide`
 - issue tracker config -> `.docs/agents/issue-tracker.md`
 
 ## Doc Hygiene
