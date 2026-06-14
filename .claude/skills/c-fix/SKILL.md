@@ -37,6 +37,10 @@ Strictly follow this path mapping:
 }
 ```
 </important>
+<attention>Before changing external APIs, verify the current version and touched API from lockfiles, local source/types, generated clients, official docs, or migration notes.
+Use web search/fetch when needed; if still unverifiable, ask for docs/version.
+Done requires validation against the real dependency.
+</attention>
 
 # Diagnose
 

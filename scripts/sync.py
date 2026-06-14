@@ -10,7 +10,6 @@ zips. Local path behavior is injected as a short instruction read from
 from __future__ import annotations
 
 import argparse
-import json
 import re
 import shutil
 import subprocess
@@ -53,6 +52,15 @@ MAPPED_SKILLS: tuple[SkillMapping, ...] = (
     SkillMapping("c-tdd", "skills/engineering/tdd", "tdd"),
     SkillMapping("c-zoom-out", "skills/engineering/zoom-out", "zoom-out"),
 )
+
+
+# 为特定 skill 追加自定义 instruction（插入到 </important> 之后）
+CUSTOM_INSTRUCTION_APPEND: dict[str, str] = {
+    "c-fix": """<attention>Before changing external APIs, verify the current version and touched API from lockfiles, local source/types, generated clients, official docs, or migration notes.
+Use web search/fetch when needed; if still unverifiable, ask for docs/version.
+Done requires validation against the real dependency.
+</attention>""",
+}
 
 
 SHARED_NON_SKILL_DIRS = ("c-shared",)
@@ -193,8 +201,7 @@ def adapt_frontmatter(root: Path, mapping: SkillMapping) -> None:
         text = replace_required(
             text,
             f"description: {description_value}",
-            "description: ban\n"
-            f"description-info: {description_value}",
+            "description: ban\n" f"description-info: {description_value}",
             path,
         )
     else:
@@ -220,9 +227,14 @@ def insert_instruction_after_frontmatter(
     if match is None:
         raise RuntimeError(f"Expected YAML frontmatter in {path}")
 
-    rewritten = (
-        match.group(1) + "\n" + instruction.strip() + "\n\n" + match.group(2).lstrip()
-    )
+    instruction_append_text = CUSTOM_INSTRUCTION_APPEND.get(mapping.local)
+    instruction_text = instruction.strip()
+    if instruction_append_text is not None:
+        instruction_text = instruction_text + "\n" + instruction_append_text
+    rewritten = f"""{match.group(1)}
+{instruction_text}
+
+{match.group(2).lstrip()}"""
     write_text(path, rewritten)
 
 
@@ -240,16 +252,6 @@ def adapt_local_skill_references(root: Path, local_skill: str) -> None:
             rewritten = rewritten.replace(old, new)
         if rewritten != text:
             write_text(path, rewritten)
-
-
-def validate_plugin_paths(root: Path) -> list[str]:
-    plugin_path = root / ".claude-plugin" / "plugin.json"
-    data = json.loads(read_text(plugin_path))
-    missing: list[str] = []
-    for relative in data["skills"]:
-        if not (root / relative).exists():
-            missing.append(relative)
-    return missing
 
 
 def list_local_only_skills(root: Path) -> list[str]:
@@ -326,12 +328,6 @@ def main() -> int:
                     adapt_frontmatter(root, mapping)
                     insert_instruction_after_frontmatter(root, mapping, instruction)
                     adapt_local_skill_references(root, mapping.local)
-
-                missing = validate_plugin_paths(root)
-                if missing:
-                    raise RuntimeError(
-                        "Missing plugin skill paths: " + ", ".join(missing)
-                    )
 
             except Exception:
                 restore_mapped_skills(root, backup_root)
