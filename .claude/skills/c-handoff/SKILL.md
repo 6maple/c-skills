@@ -22,7 +22,8 @@ Strictly follow this path mapping:
     "issue": ".docs/issues",
     "handoff": ".docs/HANDOFF.md",
     "temporary": ".docs/.tmp",
-    "architecture_report": ".docs/.tmp/architecture-review-<timestamp>.html"
+    "architecture_report": ".docs/.tmp/architecture-review-<timestamp>.html",
+    "design_implement_guide": ".docs/design-implement-guide"
   },
   "configs": {
     "issue_tracker": ".docs/agents/issue-tracker.md"

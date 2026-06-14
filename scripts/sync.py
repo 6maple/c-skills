@@ -216,26 +216,68 @@ def adapt_frontmatter(root: Path, mapping: SkillMapping) -> None:
 
 
 def insert_instruction_after_frontmatter(
-    root: Path, mapping: SkillMapping, instruction: str
+    root: Path,
+    skill_dir: str,
+    instruction: str,
+    *,
+    replace: bool = False,
 ) -> None:
-    path = root / ".claude" / "skills" / mapping.local / "SKILL.md"
+    """Insert or replace the <important> block in a skill's SKILL.md.
+
+    When *replace* is false (upstream sync), deduplicates and inserts after
+    frontmatter.  When *replace* is true (config-only sync), replaces an
+    existing <important> block in-place so the rest of the file is untouched.
+    """
+    path = root / ".claude" / "skills" / skill_dir / "SKILL.md"
     text = read_text(path)
-    if instruction in text:
+
+    instruction_append_text = CUSTOM_INSTRUCTION_APPEND.get(skill_dir)
+    instruction_text = instruction.strip()
+    if instruction_append_text is not None:
+        instruction_text = instruction_text + "\n" + instruction_append_text
+
+    if not replace and instruction_text in text:
         return
+
+    if replace:
+        match_imp = re.search(
+            r"<important>.*?</important>", text, flags=re.DOTALL
+        )
+        if match_imp is not None:
+            replace_end = match_imp.end()
+            if instruction_append_text is not None:
+                appended = text[replace_end : replace_end + len(instruction_append_text)]
+                if appended == instruction_append_text:
+                    replace_end += len(instruction_append_text)
+            new_text = text[: match_imp.start()] + instruction_text + text[replace_end:]
+            if new_text != text:
+                write_text(path, new_text)
+            return
 
     match = re.match(r"\A(---\n.*?\n---\n)(.*)\Z", text, flags=re.DOTALL)
     if match is None:
         raise RuntimeError(f"Expected YAML frontmatter in {path}")
 
-    instruction_append_text = CUSTOM_INSTRUCTION_APPEND.get(mapping.local)
-    instruction_text = instruction.strip()
-    if instruction_append_text is not None:
-        instruction_text = instruction_text + "\n" + instruction_append_text
     rewritten = f"""{match.group(1)}
 {instruction_text}
 
 {match.group(2).lstrip()}"""
     write_text(path, rewritten)
+
+
+def sync_config_to_skills(root: Path) -> None:
+    """Push the <important> block from config.md to every SKILL.md."""
+    instruction = load_sync_instruction(root)
+    skills_dir = root / ".claude" / "skills"
+    for child in sorted(skills_dir.iterdir()):
+        if not child.is_dir() or child.name in SHARED_NON_SKILL_DIRS:
+            continue
+        if not (child / "SKILL.md").exists():
+            continue
+        insert_instruction_after_frontmatter(
+            root, child.name, instruction, replace=True
+        )
+    print("Synced config to all skills.")
 
 
 def adapt_local_skill_references(root: Path, local_skill: str) -> None:
@@ -306,6 +348,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Use the existing upstream cache without fetching from origin.",
     )
+    parser.add_argument(
+        "--config-only",
+        action="store_true",
+        help="Only sync the config.md instruction block into all SKILL.md files. Skip upstream sync.",
+    )
     return parser.parse_args()
 
 
@@ -315,6 +362,10 @@ def main() -> int:
     cache_dir = args.cache_dir.resolve()
 
     try:
+        if args.config_only:
+            sync_config_to_skills(root)
+            return 0
+
         instruction = load_sync_instruction(root)
         upstream_commit = ensure_upstream(cache_dir, args.ref, fetch=not args.no_fetch)
         with tempfile.TemporaryDirectory(
@@ -326,7 +377,7 @@ def main() -> int:
                 for mapping in MAPPED_SKILLS:
                     copy_mapped_skill(root, cache_dir, mapping)
                     adapt_frontmatter(root, mapping)
-                    insert_instruction_after_frontmatter(root, mapping, instruction)
+                    insert_instruction_after_frontmatter(root, mapping.local, instruction)
                     adapt_local_skill_references(root, mapping.local)
 
             except Exception:
