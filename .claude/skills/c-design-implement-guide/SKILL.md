@@ -16,7 +16,7 @@ Strictly follow this path mapping:
     "docs/.scratch/": ".docs/.scratch",
     "per_context_CONTEXT.md": "<context>/.docs/CONTEXT.md",
     "per_context_docs/adr/": "<context>/.docs/adr",
-    "ARCH-FROM-AI.md": ".docs/ARCH-FROM-AI.md"
+    "ARCH-FROM-AI.md": ".docs/<scope-name>/ARCH-FROM-AI.md"
   },
   "outputs": {
     "prd": ".docs/prd",
