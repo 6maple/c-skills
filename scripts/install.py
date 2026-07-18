@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Install c-skills into the current working directory."""
+"""Install the cqf skill into the current working directory."""
 
 from __future__ import annotations
 
 import argparse
-import json
+import os
 import shutil
 import subprocess
 import sys
@@ -15,15 +15,9 @@ REPO_URL = "https://github.com/6maple/c-skills.git"
 CACHE_RELATIVE_PATH = Path(".cache") / "c-skills"
 GIT_DIR_NAME = ".git"
 HIDDEN_GIT_DIR_NAME = ".git-lock"
-LOCK_RELATIVE_PATH = Path("lock.json")
-SOURCE_SKILLS_RELATIVE_PATH = Path(".claude") / "skills"
-AGENT_SKILLS_PATHS = {
-    "claude": Path(".claude") / "skills",
-    "codex": Path(".agent") / "skills",
-}
-DOCS_RELATIVE_PATH = Path(".docs")
-WARNING_COLOR = "\033[33m"
-RESET_COLOR = "\033[0m"
+SOURCE_SKILLS_RELATIVE_PATH = Path("skills")
+CANONICAL_SKILLS_RELATIVE_PATH = Path(".agents") / "skills"
+CLAUDE_SKILLS_RELATIVE_PATH = Path(".claude") / "skills"
 
 
 def run(args: list[str], cwd: Path | None = None) -> str:
@@ -52,12 +46,20 @@ def sync_repo(cache_dir: Path) -> None:
     if cache_dir.exists():
         if git_dir.is_dir():
             if hidden_git_dir.exists():
-                raise RuntimeError(f"Both {GIT_DIR_NAME} and {HIDDEN_GIT_DIR_NAME} exist in cache: {cache_dir}")
+                raise RuntimeError(
+                    f"Both {GIT_DIR_NAME} and {HIDDEN_GIT_DIR_NAME} exist in cache: {cache_dir}"
+                )
             git_dir.rename(hidden_git_dir)
         if not hidden_git_dir.is_dir():
             raise RuntimeError(f"Cache path exists but is not a git repository: {cache_dir}")
-        run(["git", "--git-dir", HIDDEN_GIT_DIR_NAME, "--work-tree", ".", "fetch", "--prune", "origin"], cwd=cache_dir)
-        run(["git", "--git-dir", HIDDEN_GIT_DIR_NAME, "--work-tree", ".", "reset", "--hard", "origin/main"], cwd=cache_dir)
+        run(
+            ["git", "--git-dir", HIDDEN_GIT_DIR_NAME, "--work-tree", ".", "fetch", "--prune", "origin"],
+            cwd=cache_dir,
+        )
+        run(
+            ["git", "--git-dir", HIDDEN_GIT_DIR_NAME, "--work-tree", ".", "reset", "--hard", "origin/main"],
+            cwd=cache_dir,
+        )
         return
 
     cache_dir.parent.mkdir(parents=True, exist_ok=True)
@@ -65,98 +67,86 @@ def sync_repo(cache_dir: Path) -> None:
     git_dir.rename(hidden_git_dir)
 
 
-def load_lock(path: Path) -> dict[str, object]:
-    if not path.exists():
-        return {"agents": {}}
+def remove_path(path: Path) -> None:
+    """Remove a file, directory, symlink, or Windows junction at an explicit path."""
+    if not os.path.lexists(path):
+        return
 
-    data = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(data, dict):
-        raise RuntimeError(f"Invalid lock file: {path}")
-    if "agents" not in data:
-        data["agents"] = {}
-    if not isinstance(data["agents"], dict):
-        raise RuntimeError(f"Invalid lock file agents field: {path}")
-    return data
-
-
-def write_lock(path: Path, data: dict[str, object]) -> None:
-    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    is_junction = getattr(os.path, "isjunction", None)
+    if path.is_symlink() or (is_junction is not None and os.path.isjunction(path)):
+        path.unlink()
+    elif path.is_dir():
+        shutil.rmtree(path)
+    else:
+        path.unlink()
 
 
-def copy_skills_with_lock(source: Path, destination: Path, lock_path: Path, agent: str) -> list[str]:
-    if not source.is_dir():
-        raise RuntimeError(f"Source directory does not exist: {source}")
-
-    lock_data = load_lock(lock_path)
-    agents = lock_data["agents"]
-    agent_lock = agents.get(agent, {})
-    if not isinstance(agent_lock, dict):
-        raise RuntimeError(f"Invalid lock file entry for agent: {agent}")
-
-    old_skills = agent_lock.get("skills", [])
-    if not isinstance(old_skills, list) or not all(isinstance(name, str) for name in old_skills):
-        raise RuntimeError(f"Invalid locked skills for agent: {agent}")
-
-    destination.mkdir(parents=True, exist_ok=True)
-    for name in old_skills:
-        old_path = destination / name
-        if old_path.exists():
-            if not old_path.is_dir():
-                raise RuntimeError(f"Locked skill path exists but is not a directory: {old_path}")
-            shutil.rmtree(old_path)
-
-    skill_names = sorted(child.name for child in source.iterdir() if child.is_dir())
-    for name in skill_names:
-        source_path = source / name
-        destination_path = destination / name
-        if destination_path.exists():
-            raise RuntimeError(
-                f"Skill already exists and is not managed by lock: {destination_path}. "
-                "Move or delete it manually, then run this script again."
+def create_directory_link(target: Path, link: Path) -> bool:
+    """Create a portable local directory link, returning false when unsupported."""
+    try:
+        remove_path(link)
+        link.parent.mkdir(parents=True, exist_ok=True)
+        if sys.platform == "win32":
+            # Junctions do not require Developer Mode or symlink privileges.
+            subprocess.run(
+                ["cmd", "/c", "mklink", "/J", str(link), str(target)],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
             )
-        shutil.copytree(source_path, destination_path)
-
-    agents[agent] = {
-        "skills_path": str(AGENT_SKILLS_PATHS[agent]).replace("\\", "/"),
-        "skills": skill_names,
-    }
-    write_lock(lock_path, lock_data)
-    return skill_names
+        else:
+            link.symlink_to(os.path.relpath(target, link.parent), target_is_directory=True)
+        return True
+    except (OSError, subprocess.CalledProcessError):
+        remove_path(link)
+        return False
 
 
-def copy_docs_without_overwrite(source: Path, destination: Path) -> list[Path]:
-    if not source.is_dir():
-        raise RuntimeError(f"Source directory does not exist: {source}")
+def install_skills(source: Path, canonical_destination: Path) -> None:
+    remove_path(canonical_destination)
+    shutil.copytree(source, canonical_destination)
 
-    warnings: list[Path] = []
-    for source_path in source.rglob("*"):
-        relative_path = source_path.relative_to(source)
-        destination_path = destination / relative_path
 
-        if source_path.is_dir():
-            destination_path.mkdir(parents=True, exist_ok=True)
-            continue
+def install_for_agent(
+    source: Path,
+    canonical_destination: Path,
+    agent: str,
+    copy_mode: bool,
+) -> tuple[Path, bool]:
+    install_skills(source, canonical_destination)
 
-        destination_path.parent.mkdir(parents=True, exist_ok=True)
-        if destination_path.exists():
-            warnings.append(destination_path)
-            continue
+    if agent == "codex":
+        return canonical_destination, False
 
-        shutil.copy2(source_path, destination_path)
+    claude_destination = canonical_destination.parent.parent / CLAUDE_SKILLS_RELATIVE_PATH
+    if copy_mode:
+        remove_path(claude_destination)
+        shutil.copytree(canonical_destination, claude_destination)
+        return claude_destination, False
 
-    return warnings
+    if create_directory_link(canonical_destination, claude_destination):
+        return claude_destination, False
+
+    shutil.copytree(canonical_destination, claude_destination)
+    return claude_destination, True
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Pull 6maple/c-skills into .cache/c-skills and install skills/docs for an agent."
+        description="Pull 6maple/c-skills into .cache/c-skills and install the cqf skill."
     )
     parser.add_argument(
         "-a",
         "--agent",
-        choices=sorted(AGENT_SKILLS_PATHS),
+        choices=("claude", "codex"),
         required=True,
         help="Agent type to install for.",
+    )
+    parser.add_argument(
+        "--copy",
+        action="store_true",
+        help="For Claude, copy skills instead of creating a directory link.",
     )
     return parser.parse_args()
 
@@ -167,27 +157,22 @@ def main() -> int:
 
     try:
         cache_dir = ensure_inside_root(execution_root / CACHE_RELATIVE_PATH, execution_root)
-        skills_destination = ensure_inside_root(execution_root / AGENT_SKILLS_PATHS[args.agent], execution_root)
-        docs_destination = ensure_inside_root(execution_root / DOCS_RELATIVE_PATH, execution_root)
+        canonical_destination = ensure_inside_root(
+            execution_root / CANONICAL_SKILLS_RELATIVE_PATH, execution_root
+        )
 
         sync_repo(cache_dir)
+        source = cache_dir / SOURCE_SKILLS_RELATIVE_PATH
+        installed_path, used_copy_fallback = install_for_agent(
+            source, canonical_destination, args.agent, args.copy
+        )
 
-        skills_source = cache_dir / SOURCE_SKILLS_RELATIVE_PATH
-        docs_source = cache_dir / DOCS_RELATIVE_PATH
-        lock_path = cache_dir / LOCK_RELATIVE_PATH
-        installed_skills = copy_skills_with_lock(skills_source, skills_destination, lock_path, args.agent)
-        docs_warnings = copy_docs_without_overwrite(docs_source, docs_destination)
-
-        print(f"Installed c-skills for {args.agent}.")
+        print(f"Installed cqf for {args.agent}.")
         print(f"Repository cache: {cache_dir}")
-        print(f"Skills: {skills_destination} ({len(installed_skills)} skills)")
-        print(f"Docs: {docs_destination}")
-        for path in docs_warnings:
-            print(
-                f"{WARNING_COLOR}Warning: docs file already exists, skipped. "
-                f"Review manually if updates are needed: {path}. "
-                f"Also check whether c-shared/config.md needs updating.{RESET_COLOR}"
-            )
+        print(f"Canonical skills: {canonical_destination}")
+        print(f"Agent skills: {installed_path}")
+        if used_copy_fallback:
+            print("Warning: directory link creation failed; installed a copy for Claude.")
         return 0
     except (OSError, RuntimeError, subprocess.CalledProcessError, ValueError) as error:
         print(f"install failed: {error}", file=sys.stderr)
