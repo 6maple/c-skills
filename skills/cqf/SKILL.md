@@ -115,7 +115,7 @@ Ignore matters whose different answers would not affect the target depth, curren
 - Do not invent facts, experiences, feelings, or private context known only to the user.
 - Use open questions to discover unknown intent.
 - Use limited options to clarify known trade-offs.
-- When a supported question/input tool is available, use it first to present the question and options. Otherwise, use a concise Markdown list labeled `A`, `B`, `C`, etc.
+- <important-question-schema>When a supported question/input tool is available, use it first to present the question and options. Otherwise, use a concise Markdown list labeled `A`, `B`, `C`, etc.</important-question-schema>
 - Put the recommendation first when appropriate, keep options to 2–4, and allow the user to reject or reframe them. Use labeled options only for real decision branches.
 - Use recommendations to reduce decision burden.
 - Always allow the user to reject or reframe the offered options.
