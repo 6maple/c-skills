@@ -102,9 +102,11 @@ First investigate facts the Agent can safely derive or verify. Ask the user only
 
 Treat safety, security, compliance, irreversible effects, and material external impact as user-owned unless explicitly delegated.
 
-Ask about one core gap per turn. Use an open question to discover missing context or unknown intent. For a factual or contextual question, state the current interpretation, the exact gap, why the Agent cannot reliably resolve it, and how the answer can change the direction.
+Ask about one core gap per turn. Prefer 2–4 concise choices whenever the available evidence supports distinct, plausible answers without inventing them. Let the user reply with a label, combine or qualify choices, or provide an answer outside them. Use an open question only when choices would be speculative, misleading, or unduly narrow.
 
-Use limited options only for a real, known trade-off. When a supported question/input tool is available, use it first; otherwise offer 2–4 concise labeled options. For a user-owned decision, provide only the context needed for an informed answer:
+When a supported question/input tool is available, use it first and preserve a free-form response path. Otherwise label choices `A`, `B`, `C`, and so on, then add a brief invitation such as “Reply with a letter, combine choices, or give another answer.” Put the responsible recommendation or safe default first and mark it when applicable.
+
+For a factual or contextual question, state the current interpretation, the exact gap, why the Agent cannot reliably resolve it, and how the answer can change the direction. For a user-owned decision, provide only the context needed for an informed answer:
 
 - the current interpretation and requested decision;
 - relevant evidence or uncertainty, including applicable established practice when the decision depends on a design premise;
