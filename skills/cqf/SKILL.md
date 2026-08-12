@@ -5,305 +5,154 @@ description: only invokes by user
 
 # Clarify
 
-Use a focused discussion to uncover the user's actual goal, resolve material decisions, and reach shared understanding without unnecessary questioning.
-
-The result is a confirmed understanding, not a PRD, design, plan, implementation, or other downstream artifact. Stop after alignment unless the user explicitly starts a new task.
+Reach a shared, evidence-grounded understanding of the user's actual goal. Produce alignment only: do not write a PRD, design, plan, implementation, or other downstream artifact unless the user starts a new task.
 
 ## Boundary
 
-- Use only when the user explicitly invokes this skill by name or command.
-- Never select it automatically because a request is vague, risky, underspecified, or ready for planning.
-- Do not couple it to any project workflow, document path, or downstream skill.
-- Do not force agreement. An explicit unresolved difference is better than false consensus.
+- Use only when the user explicitly invokes this skill by name or command. Never select it automatically because a request is vague, risky, underspecified, or ready for planning.
+- Keep one active convergence path. Do not silently expand scope because a related idea appears.
+- Do not force agreement. Record a material unresolved difference rather than claim consensus.
+- Treat the final alignment record as input to downstream work, not as control over it. Any downstream workflow remains responsible for preserving and checking the recorded commitments.
 
-## Core Behavior
+<intent-first>
 
-- Discuss what is necessary and useful; do not optimize for the fewest questions.
-- Make material assumptions, inferences, recommendations, and Agent decisions visible when they can change the target, scope, trade-offs, downstream artifact, or practical result.
+When the user says to first understand their intent, or otherwise asks for understanding or alignment before action, enter an intent-first turn. Inspect only the context needed to understand the request, then state a concise, correctable intent frame: the surface request, inferred outcome, evidence for that inference, and the one most material unresolved point.
 
-<agent-ownership>
+Do not modify files, create a downstream artifact, select a solution, recommend a direction, or advance to implementation in an intent-first turn. Ask at most one essential clarification when the available context cannot support a correctable frame. Wait for the user to ask to proceed or to confirm the direction before leaving this turn type.
 
-- Take responsibility for discovering and analyzing available context. Do not require the user to provide a complete brief or information the Agent can safely derive, verify, or investigate.
+</intent-first>
 
-</agent-ownership>
+## Keep the Alignment State
 
-- Ask the user only for information or decisions that cannot be safely derived, verified, or delegated.
-- Keep one active convergence path and progressively narrow it toward a defined target depth.
-- Do not assume the user's first wording is precise, complete, or identical to what they ultimately want.
-- Treat the user's wording as evidence of intent, not as a final specification. Form a charitable, correctable view of the underlying outcome and explain the evidence for it; do not speculate about private motives or present an inference as fact.
+<always-maintain>
 
-## Intent-First Alignment
+Maintain these four items throughout the discussion. Show them only when their change matters to the user or the next decision.
 
-At a new goal, material correction, topic shift, or before a material question, recommendation, or direction change, investigate available context and present a concise, correctable intent frame before proceeding:
+1. **Target** — the surface request, the correctable underlying goal, its required depth, scope, boundaries, relevant system dependencies and contracts, and acceptance context.
+2. **Evidence** — verified facts; existing but unverified or conflicting material; reasoned inferences; and assumptions or hypotheses still needing validation.
+3. **Commitments** — material user requirements and decisions, each marked `proposed`, `confirmed-pending`, `completed`, `superseded`, or `parked`.
+4. **Next gap** — the most upstream unresolved issue that can still change the result at the required depth.
 
-<intent-frame>
+</always-maintain>
 
-- the current understanding of the underlying goal;
-- the relationship between the surface request and that goal;
-- the material evidence, constraints, or assumptions that support the understanding;
-- the next unresolved issue or action needed to advance alignment.
+Treat the user's wording as evidence of intent, not as a final specification. Distinguish a requested solution or implementation choice from the outcome it is meant to achieve; do not speculate about private motives or present an inference as fact.
 
-</intent-frame>
+Use the least depth that supports the user's next stage: intent sufficient to decide whether to proceed; requirements sufficient to write requirements; design decisions sufficient to design; or behavior and boundaries sufficient to implement. State the inferred depth; ask the user only if the choice materially changes discussion cost or outcome.
 
-Use the existing confirmed understanding when it remains sufficient. Update and surface the frame only when the direction or its material basis changes; do not require explicit confirmation when no material uncertainty remains.
+Classify new information immediately:
 
-## Ground Designs in Evidence
+- correction → update the current direction;
+- necessary dependency → resolve it before dependent details;
+- additive requirement → add a commitment;
+- explicit replacement or incompatibility → supersede the affected commitment and state why;
+- independent goal → park it explicitly;
+- invalidated goal or explicit focus change → reset the target and state the new required depth.
 
-<evidence-discipline>
+## Run the Alignment Loop
 
-- Treat existing code and documentation as evidence, not as presumed-correct facts. Assess their reliability against observable behavior, explicit constraints, data, or realistic acceptance scenarios when material.
-- Distinguish verified facts, existing but unverified or conflicting material, reasoned inferences, and assumptions that still need validation. Do not silently promote one category into another.
+<before-each-material-move>
 
-</evidence-discipline>
+At a new goal, material correction, topic shift, before a material question or direction change, and before closure, run this loop. Reuse a sufficient current state rather than repeating it mechanically.
 
-- For a material conclusion, proposal, or design direction, state the minimum traceable source or verification method and why it fits: relevant existing evidence, observed behavior, a test or measurement, a verifiable established practice, or a realistic acceptance scenario. Do not fabricate a source or imply validation that has not occurred.
-- If evidence is insufficient, mark the proposal as a hypothesis, identify the missing validation, and avoid presenting it as a settled design.
-- Design only what the current goal and verifiable acceptance need. Do not invent rules, architecture, boundaries, or future scenarios merely to make a solution appear complete.
+1. **Observe.** Read the conversation and user-provided material. Inspect files, tools, documentation, and the environment for information the Agent can safely discover. Do not ask the user for information that can be derived, verified, or investigated.
+2. **Ground.** Verify material facts when practical. For a material technical or design premise, investigate applicable real-world practice when external research is available and proportionate. Update the evidence state; do not treat code, documentation, an online example, or user agreement as proof.
+3. **Frame.** Form a concise, correctable view of the target, its supporting evidence and constraints, material assumptions or Agent decisions, and the next gap. State this frame when it can materially change the direction or lets the user correct it.
+4. **Converge.** Resolve one core judgment: prefer the gap that constrains the most later choices or makes lower-level discussion meaningful. Recompute the next gap after every answer. Do not follow a prewritten questionnaire.
+5. **Record.** Update the alignment state and prune irrelevant or dependent branches. Make a low-risk, reversible, local default only when it is clear or delegated; disclose it when material.
 
-## Independent Evaluation
+</before-each-material-move>
 
-<independent-evaluation>
+For vague requests, establish goal, user or scenario, and main boundary before implementation details or edge cases.
 
-- Evaluate each material factual claim, causal judgment, and solution candidate against the goal, constraints, evidence, and acceptance scenarios.
-- For a material conclusion, identify the evidence that supports it, the evidence or conditions that limit it, and the facts that would change the assessment.
+Control expansion: stop probing when remaining detail cannot change the target, direction, risk, or next step. Summarize what is known, park side topics, and disclose safe defaults instead of extending the discussion for form's sake.
 
-</independent-evaluation>
+## System-Boundary Gate: Keep Local Decisions in Context
 
-- Keep user-owned goals, values, and risk preferences distinct from factual and technical claims that require independent evaluation.
-- When an evidence-based assessment differs from the user's initial framing or preferred solution, explain the difference, basis, and practical consequence respectfully.
-- Treat user confirmation as confirmation of intent, preference, or authorization; establish factual and technical support through the relevant evidence or validation.
+<system-boundary-gate>
 
-## Design From Whole to Part
+Before presenting a material local conclusion, design direction, implementation choice, or question about one, first establish the current layer and only the relevant overall goal, upstream inputs, downstream consumers, interface contracts, shared state, cross-layer constraints, and acceptance path.
 
-- Progress top-down: establish the overall goal, acceptance context, system-level boundaries, and current-layer responsibilities before discussing local mechanisms.
+Resolve one layer at a time. Treat lower layers as black boxes constrained by their required responsibilities and interfaces until they become the current layer. After material evidence or a local conclusion, recheck whether it changes the system boundary, dependencies, contracts, assumptions, or acceptance path; update the alignment state when it does. Do not expand the system view beyond what can change the current target, direction, risk, or acceptance result.
 
-<system-view>
+</system-boundary-gate>
 
-- Before a material local conclusion, design direction, or implementation choice, identify only the relevant affected system goal, upstream inputs, downstream consumers, interface contracts, shared state, cross-layer constraints, and acceptance path.
-- Resolve one design layer at a time. Treat lower layers as black boxes constrained only by their required responsibilities and interfaces until their layer becomes the current focus.
-- After a material local conclusion or new evidence, recheck whether it changes the current system boundaries, dependencies, assumptions, or acceptance scenarios; update the shared understanding when it does.
+## Direction Gate: Ground Claims and Designs
 
-</system-view>
+<direction-gate>
 
-- After a material direction is established, revisit it from the whole-system perspective. Compare it with the original goal, constraints, and acceptance scenarios; surface local choices that create global drift, duplication, conflict, or unnecessary complexity.
+Pass this gate before presenting a material factual claim, proposal, design direction, or question that depends on a design premise.
 
-## Set the Target Depth
+- Separate verified facts, unverified material, inferences, and hypotheses. State the minimum traceable source or verification method and why it fits. Do not fabricate a source or imply validation that has not occurred.
+- Prefer an applicable, practice-validated approach over a novel design inferred only from first principles. Seek authoritative primary guidance and standards, maintained production-used projects with tests and documentation, credible implementation case studies, and local observed behavior or measurements.
+- Treat popularity, stars, search ranking, or a single example as discovery signals, not proof of correctness or fit. For a selected practice, state the source, validation or use signal, relevant context, fit, material mismatch, and needed adaptation. Do not copy a common pattern merely because it is common.
+- If evidence is insufficient, call the proposal a hypothesis, name the missing validation, and say how it can be checked. Do not turn an imagined scenario into a requirement or ask the user to decide it as though it were established.
+- Evaluate a user-proposed solution independently against the goal, constraints, evidence, alternatives, and acceptance scenarios. Keep user goals, values, and risk preferences distinct from factual or technical claims. Respect an informed user decision even when it differs from the Agent's recommendation.
+- Design only what the current target and verifiable acceptance need. Do not invent rules, architecture, boundaries, or future scenarios to make a solution appear complete.
 
-Infer and briefly state the needed depth:
+</direction-gate>
 
-- intent clear enough to decide whether or why to proceed;
-- requirements clear enough to support a requirements document;
-- design decisions clear enough to support design work;
-- behavior and boundaries clear enough to support implementation.
+## Question Gate: Ask Only for User-Owned Information and Judgments
 
-These are guides, not a fixed menu. Ask the user to choose only when the depth is genuinely ambiguous or materially changes the discussion cost; otherwise disclose the inference and continue.
+<question-gate>
 
-## Discussion Loop
+First investigate facts the Agent can safely derive or verify. Ask the user only for either:
 
-Before asking a question:
+- material context or facts that the Agent cannot reliably obtain from the conversation, available sources, tools, or reasonable investigation; or
+- a material decision that depends on the user's intent, values, domain judgment, authorization, or risk acceptance and cannot be safely decided by the Agent.
 
-1. Read the existing conversation and user-provided material.
-2. Investigate available files, tools, documentation, and the environment for context the Agent can discover.
-3. Verify material facts when practical; do not treat the existence of code or documentation as verification.
-4. Form a concise, correctable view of:
-   - what the user currently asks for;
-   - the surface request, inferred underlying outcome, and evidence for that inference;
-   - known constraints and boundaries;
-   - <evidence-status>verified facts, unverified or conflicting material, inferences, and assumptions</evidence-status>;
-   - material assumptions or Agent decisions;
-   - the most upstream unresolved issue.
-5. Present only what is useful for correction or review.
+Treat safety, security, compliance, irreversible effects, and material external impact as user-owned unless explicitly delegated.
 
-Then repeat:
+Ask about one core gap per turn. Use an open question to discover missing context or unknown intent. For a factual or contextual question, state the current interpretation, the exact gap, why the Agent cannot reliably resolve it, and how the answer can change the direction.
 
-```text
-identify the most upstream material gap
-→ resolve one core judgment
-→ prune dependent or irrelevant branches
-→ update the shared understanding
-→ repeat until the target depth is supported
-```
+Use limited options only for a real, known trade-off. When a supported question/input tool is available, use it first; otherwise offer 2–4 concise labeled options. For a user-owned decision, provide only the context needed for an informed answer:
 
-Prefer the unresolved issue that constrains the most later decisions, excludes the most irrelevant directions, or must be resolved before lower-level details become meaningful.
+- the current interpretation and requested decision;
+- relevant evidence or uncertainty, including applicable established practice when the decision depends on a design premise;
+- why that evidence or practice fits, including material limits or counterevidence;
+- a responsible recommendation for a high-impact choice, its principal trade-off, and how each known option changes direction;
+- why the Agent cannot safely make the decision alone.
 
-For obviously vague requests, begin with scope-narrowing questions. Do not jump into implementation choices, local details, or edge cases while the goal, user, scenario, or main boundary remains unclear.
+Do not use a research dump, unexplained jargon, or ask the user to investigate on the Agent's behalf.
 
-Recompute the next question after every answer. Do not follow a prewritten questionnaire after the direction changes. The skill may ask no question when the existing context already supports alignment.
+</question-gate>
 
-## Handle Facts and Decisions Differently
+## Closure Gate: Establish Handoff-Ready Alignment
 
-### Verifiable facts
+<closure-gate>
 
-Look them up instead of asking the user. Disclose only material facts; mark an unverifiable material fact as an unknown premise rather than presenting it as true.
+Before closing, check every `confirmed-pending` commitment. Cover it in the shared understanding or mark it `superseded` or `parked` with the reason. In this skill, `completed` means the alignment work for that commitment is complete; it never means downstream work was performed.
 
-### User-owned decisions
+Declare the alignment handoff-ready only when the next analysis, design, documentation, or implementation stage will not need to independently resolve anything that could materially change the goal, scope, direction, risk, or acceptance result. Ensure that:
 
-Ask the user only when a decision materially affects the goal, scope, success criteria, major trade-offs, risk, reversibility, or next step and depends on the user's values, domain judgment, authorization, or risk acceptance. Treat safety, security, compliance, irreversible effects, and material external impact as user-owned unless the user explicitly delegates them.
+- the main wrong directions are excluded;
+- scope, boundaries, acceptance conditions, evidence status, material assumptions, and Agent decisions are visible;
+- remaining unknowns are marked blocking or non-blocking; every non-blocking unknown has a temporary default and cannot overturn the agreed direction;
+- no material contradiction is hidden;
+- important choices include their material cost or trade-off.
 
-Give a recommendation first when responsible. For high-impact choices, include in the material question's `<question-context>` the recommendation, main reason, principal cost or trade-off, and the condition that would change the recommendation.
+Validate weak alignment rather than mistaking it for confirmation. Do this one core risk at a time when goals conflict or remain abstract, the user merely repeats the Agent's framing, a costly recommendation receives quick agreement, delegation or terse replies suggest fatigue, or a proposal has no clear problem it solves. Use a concrete example, consequence, failure test, contradiction, or disclosed default; stop when no remaining risk can change the result.
 
-The user's informed decision is final. Shared understanding does not require accepting the Agent's recommendation.
+Use one of these end states:
 
-### Agent decisions
+1. **Confirmed alignment** — the user confirms an understanding sufficient for the required depth.
+2. **Actionable alignment with explicit unknowns** — remaining unknowns and defaults do not block the agreed next stage.
+3. **Explicit unresolved blocker** — a material difference, missing fact, or unstable preference prevents alignment.
 
-The Agent may decide low-risk, reversible, local matters with a clear default, or decisions the user explicitly delegates. Disclose material Agent decisions briefly; do not report trivial presentation or operational choices.
+Only the first two states are handoff-ready. The third is a recorded stop: identify the blocking evidence or decision and do not present downstream work as ready to proceed.
 
-### Irrelevant details
-
-Ignore matters whose different answers would not affect the target depth, current direction, or next step.
-
-## Question Rules
-
-- Ask for one core judgment per turn; do not batch independent decisions.
-- Attach a current interpretation or recommendation when useful, so the user can correct rather than generate from nothing.
-- Do not invent facts, experiences, feelings, or private context known only to the user.
-- Use open questions to discover unknown intent.
-- Use limited options to clarify known trade-offs.
-- <important-question-schema>When a supported question/input tool is available, use it first to present the question and options. Otherwise, use a concise Markdown list labeled `A`, `B`, `C`, etc.</important-question-schema>
-- Put the recommendation first when appropriate, keep options to 2–4, and allow the user to reject or reframe them. Use labeled options only for real decision branches.
-
-For each material question, give only the context needed for an informed answer, in clear everyday language:
-
-<question-context>
-
-- the current interpretation and the decision being requested;
-- the relevant evidence or its uncertainty, including the minimum traceable source or verification method when material;
-- material limiting conditions, counterevidence, or credible alternatives when they could change the decision;
-- why the Agent cannot safely decide it alone;
-- the recommendation, main trade-off, and how the answer changes the direction.
-
-</question-context>
-
-Do not expose a research dump, use unexplained jargon, or ask the user to perform investigation the Agent can perform.
-
-Evaluate a user-proposed solution as a candidate against the underlying goal, evidence, constraints, and acceptance scenarios. Compare credible alternatives when they could materially change the direction, and explain any material difference in fit, risk, or cost. Once the user understands the trade-off and still chooses it, accept the decision.
-
-Probe only to the depth that can change or guide the current task. Do not pursue ultimate psychological motives or reinterpret the user beyond the evidence.
-
-## Maintain Alignment State
-
-Internally distinguish:
-
-- **confirmed** — explicitly stated or confirmed by the user;
-- **current inference** — the Agent's correctable interpretation;
-- **Agent decision** — a disclosed default or delegated decision;
-- **commitment** — a material user-confirmed requirement, decision, or requested change and its status;
-- **unresolved** — still capable of changing the result at the target depth;
-- **parked** — relevant but outside the current convergence path.
-
-Before each response, recheck the current goal and target depth, evidence status, material assumptions, relevant system boundaries, dependencies, and cross-layer constraints, and whether the next action is investigation, a user-owned decision, or closure. Recheck again after a correction, conflicting evidence, a topic shift, a high-impact recommendation, or before closure.
-
-Do not promote vague agreement into a stronger claim. Surface the alignment state only when it materially changes or is needed for the user to make an informed decision; show meaningful changes, new defaults, corrected assumptions, and the next material issue rather than repeating a fixed status statement.
-
-Classify new information as follows:
-
-- correction to the current direction → absorb it;
-- necessary dependency → resolve it in dependency order;
-- additional requirement for the current target → add it to the active commitments;
-- explicit replacement or incompatible requirement → mark the affected commitment as superseded and explain why;
-- independent new goal or feature → park it explicitly;
-- information that invalidates the current goal → reset the target and direction;
-- explicit request to change focus → switch and restate the target depth.
-
-Do not silently expand scope because a related idea appears.
-
-## Track Confirmed Commitments
-
-Maintain a compact internal ledger of material commitments with one of these statuses: `proposed`, `confirmed-pending`, `completed`, `superseded`, or `parked`. Treat new requirements as additive when the user frames them as additions to the current target; preserve earlier confirmed-pending commitments unless the user explicitly replaces them or they are materially incompatible.
-
-Before proposing a next action, preparing handoff, or declaring completeness, cross-check every confirmed-pending commitment. Represent each in the current work or handoff, or explicitly mark it as superseded or parked with the reason. Do not report completion based only on the most recently discussed item.
-
-## Control Expansion
-
-Do not set a fixed question limit. Compress the discussion when the marginal value of more questions falls, especially when:
-
-- answers become repetitive, vague, fatigued, or merely complete a format;
-- each answer spawns lower-value details or discussion drifts into unrelated motives, scenarios, or features;
-- remaining decisions are low-risk and reversible, or the Agent has a reliable recommendation but keeps pushing decisions back to the user.
-
-When this happens, summarize what is known, park side branches, make and disclose safe defaults, and ask only what can still change the direction. Otherwise, move to validation and closure.
-
-## Check Sufficiency
-
-Judge sufficiency according to the target depth and current task, not a fixed questionnaire.
-
-Before closing, ensure that:
-
-- the current understanding excludes the main wrong directions;
-- the next stage will not need to guess the actual goal, material information, key decisions, or acceptance conditions;
-- remaining unknowns cannot overturn the current scope or main approach;
-- material assumptions and Agent decisions are visible;
-- the user understands the main cost of important choices;
-- no material contradiction remains hidden.
-
-Abstract phrases such as “for everyone,” “improve experience,” or “keep it simple” require refinement only when different interpretations would change the result.
-
-## Validate Based on Risk
-
-Treat user confirmation as useful alignment evidence, then validate material factual, technical, and risk assumptions through the appropriate evidence or test.
-
-Validate a material risk when there are signs such as:
-
-- abstract, ambiguous, or conflicting goals;
-- the user merely repeating the Agent's framing, or a quick acceptance of a recommendation with a significant cost;
-- repeated delegation, increasingly terse answers, or other signs of fatigue rather than intent;
-- a proposed solution without a clear problem it solves.
-
-Validate one core risk at a time using a concrete example, acceptance of a consequence, a failure test, direct resolution of a contradiction, or explicit disclosure of an Agent decision and its trade-off.
-
-Repeat only while a remaining material risk can still change the result. No risk signal means no extra interrogation.
-
-## End States
-
-The discussion may end in one of three valid states:
-
-1. **Confirmed alignment** — the user confirms an understanding sufficient for the target depth.
-2. **Actionable alignment with explicit unknowns** — remaining unknowns and temporary defaults are visible and do not block the agreed next stage.
-3. **Explicit unresolved disagreement** — a material difference, missing fact, or unstable preference prevents alignment; record it rather than forcing agreement.
-
-Only the first state is complete alignment.
-
-## Handoff Readiness
-
-<handoff-gate>
-
-Close only when a later analysis, design, documentation, or implementation stage can proceed without independently resolving anything that could materially change the goal, scope, solution direction, risk, or acceptance result. Record every remaining unknown as blocking or non-blocking; for a non-blocking unknown, state its temporary default and why it cannot overturn the agreed direction.
-
-Cross-check every confirmed-pending commitment before handoff; no commitment may be omitted without an explicit superseded or parked status and reason.
-
-</handoff-gate>
+</closure-gate>
 
 ## Final Output
 
-Provide a concise summary scaled to the task. Include only applicable items, typically:
+Provide a concise record scaled to the task. Include only applicable items:
 
-<final-summary>
-
-- the surface request, actual goal or change sought, and evidence for their relationship;
-- success at the target depth, key scope, boundaries, non-goals, and acceptance conditions;
-- material facts, their evidence status, traceable source or verification method, supporting evidence, and material limitations; important user-confirmed decisions, Agent decisions, assumptions, and their reasons or trade-offs;
-- material alternatives considered and why they were not selected;
-- material cross-boundary dependencies, interface contracts, shared state, or composition risks that can affect later work;
-- unresolved matters marked as blocking or non-blocking, including temporary defaults for non-blocking matters;
-- parked side topics;
+- surface request, underlying goal, required depth, and evidence for their relationship;
+- success criteria, scope, boundaries, non-goals, and acceptance conditions;
+- material facts and evidence status; source or verification method; limitations; material alternatives; and relevant system dependencies or contracts;
+- confirmed user decisions, material Agent decisions, assumptions, commitments, and their reasons or trade-offs;
+- unresolved matters marked blocking or non-blocking, with non-blocking defaults; parked topics;
 - one recommended next step, clearly marked as a recommendation and not executed.
 
-</final-summary>
+When multiple commitments exist, add a compact coverage record showing each commitment's status and the reason for every `superseded` or `parked` item. Invite correction: “Please point out the least accurate part or the trade-off that least reflects what you want. If none, confirm the summary.”
 
-When multiple material commitments exist, add a compact coverage record:
-
-<commitment-coverage>
-
-- each confirmed commitment and its status: `confirmed-pending`, `completed`, `superseded`, or `parked`;
-- the reason for every superseded or parked commitment;
-- any confirmed-pending commitment that remains for the recommended next step.
-
-</commitment-coverage>
-
-Invite correction: “Please point out the least accurate part or the trade-off that least reflects what you want. If none, confirm the summary.”
-
-If alignment cannot be reached, state what is agreed, the unresolved issue, both current positions when known, and what evidence or decision would allow it to be revisited.
-
-Revise the record while useful new information is still emerging. If further discussion no longer adds information, state that no shared record can currently be formed and stop without claiming agreement.
-
-After the user confirms or accepts an accurately recorded end state, stop. Do not create downstream artifacts or continue the original task within this skill.
+If alignment cannot be reached, state what is agreed, the unresolved issue, the current positions when known, and what evidence or decision would allow revisiting it. After the user accepts an accurately recorded end state, stop.
