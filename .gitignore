@@ -2,3 +2,5 @@
 .cache
 __pycache__
 .claude/skills
+.pnpm-store
+.brain-data

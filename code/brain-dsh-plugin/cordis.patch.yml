@@ -1,0 +1,7 @@
+# @dsh-external/brain-dsh-plugin bundle 层：插入本插件 loader entry。
+# 与 dsh-super-injector 的 bundle 声明同构：包内自带 patch 层，
+# 由 dsh-app-boot 在启动时按 dsh.profile.bundles 顺序装配。
+- insert:
+    - id: brain-dsh-plugin
+      name: '@dsh-external/brain-dsh-plugin'
+      config: {}

@@ -1,0 +1,7 @@
+# ── 极简触发 → 创造能力路由器 ──────────────────────────────────────────────
+# 首轮完全复用 router-standard 的 standard 模式：只有 RL 句 + shell/str_replace_editor。
+# 第一个 tool/call 后放行完整创造目录；随后注入一次原版 cordis persona（作为上下文）。
+- id: router-bootstrap-creator
+  name: ./router-bootstrap-creator.mjs
+  config:
+    routerMode: standard

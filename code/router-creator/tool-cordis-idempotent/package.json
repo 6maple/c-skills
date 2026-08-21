@@ -1,0 +1,21 @@
+{
+  "name": "@dsh-external/tool-cordis-idempotent",
+  "version": "0.1.0",
+  "description": "Host-plane compatibility shim: makes cordisInspect.register idempotent so multiple presets containing tool-cordis can coexist in one DSH process.",
+  "private": false,
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    }
+  },
+  "files": [
+    "lib",
+    "README.md"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "cordis": ">=4.0.0-rc <5"
+  }
+}
